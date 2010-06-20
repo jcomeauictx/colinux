@@ -1,0 +1,35 @@
+--- fltk-1.1.10/FL/x.H
++++ fltk-1.1.10/FL/x.H
+@@ -140,6 +140,8 @@
+ 
+ extern FL_EXPORT int fl_parse_color(const char* p, uchar& r, uchar& g, uchar& b);
+ 
++extern int (*fl_x_global_event_hook)(const XEvent& thisevent);
++
+ #  endif
+ #endif
+ 
+--- fltk-1.1.10/src/Fl_x.cxx
++++ fltk-1.1.10/src/Fl_x.cxx
+@@ -556,6 +556,8 @@
+   }
+ }
+ 
++int (*fl_x_global_event_hook)(const XEvent& thisevent) = NULL;
++
+ ////////////////////////////////////////////////////////////////
+ 
+ static char unknown[] = "<unknown>";
+@@ -567,6 +569,12 @@
+   fl_xevent = &thisevent;
+   Window xid = xevent.xany.window;
+ 
++  if (fl_x_global_event_hook != NULL) {
++    if (fl_x_global_event_hook(thisevent)) {
++      return 0;
++    }
++  }
++
+   switch (xevent.type) {
+ 
+   case KeymapNotify:
