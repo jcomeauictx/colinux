@@ -1,0 +1,617 @@
+colinux-daemon - help/manpage
+=============================
+
+The Cooperative Linux Daemon hosts the Linux virtual machine as one process
+under the host operating system.
+
+The daemon splits out the kernel's printk() messages along with its own prints.
+It also optionally launches the virtual VGA console, that can be used to
+interface with the virtual machine.  For every network device it launches a
+network daemon.
+
+
+Command Line Parameters for installing/removing
+-----------------------------------------------
+
+The following options are specific to Windows NT/XP/2000.
+
+    --install-service servicename startparameters
+
+	Allows you to install Cooperative Linux as a service.
+
+	<servicename> is whatever you want it to be called.
+	<startparameters> is the list of colinux start options (see follows)
+	or the config file with options as '@configfile'.
+
+	To run the service you should use the windows service managment
+	console or the command line tool "net start".
+
+	Example:
+	colinux-daemon @example.conf --install-service "coLinux"
+	net start "coLinux"
+
+    --remove-service servicename
+
+	Allows you to remove the Cooperative Linux service.
+	Please shut down coLinux, before removing the service.
+
+	Example:
+	net stop "coLinux"
+	colinux-daemon --remove-service "coLinux"
+
+    --install-driver
+
+	This command installs the driver portion of Cooperative
+	Linux. NOTE: This already happens during the installation
+	of coLinux, in most cases you don't need to run it at all.
+
+	If the driver is already installed, this command would
+	reinstall the driver.
+
+	This command is not compatible with any other parameters.
+
+    --remove-driver
+
+	This command will remove the driver portion of Cooperative
+	Linux. BIG NOTE: This already happens during the uninstall
+	of coLinux, in most cases you don't need to run it at all.
+
+	Please shut down coLinux, before removing the driver.
+	This command is not compatible with any other parameters.
+
+	You can also remove the linux.sys driver with standard Windows tools
+	and many mouse clicks.  Open your System settings - control panel -
+	hardware device	manager - under "View" options enable "view hidden
+	drivers" - open the non PnP drivers - locate and uninstall the device
+	entry "CoLinuxDriver" and reboot Windows.
+
+    --status-driver
+
+	Show status about the installed/running driver.
+	This command is not compatible with any other parameters.
+
+
+Command Line Parameters for running
+-----------------------------------
+
+The following command line paramaters may be useful in operating Cooperative
+Linux for running from command line.
+
+    @configfile
+
+	Allows you to choose a specific configuration file to
+	use, can have multiple @configfile on the command-line,
+	last on the command-line take precedence and overrides
+	earlier @configfile options
+
+    -k
+
+	suppresses Kernel messages (good for debugging other daemons)
+
+    -t consoletype
+
+	Allows you to specify either the FLTK (default) or NT (-t nt)
+	console to use on startup.
+
+    -d
+
+	Don't launch and attach a coLinux console on startup.  This is
+	the default for running as service.
+
+    -p pidfile
+
+	Write PID to file.
+	It is mostly for running more as one coLinux instances on one machine.
+	Console can read the pid from this file.
+
+    -v level
+
+	Verbose messages, level 1 prints booting details, 2 or
+	more checks configs, 3 prints errors, default is 0 (off)
+
+    -h
+
+	Shows a short help text
+
+
+Configuration and boot parameters
+---------------------------------
+
+The following parameters can be written into the configfile or,
+if the first command-line argument on the command line is
+kernel= you will be able to give all the configuration on the
+command-line.  Order of parameters is not important when options
+don't depend on each other.  The parameters are case sensitive.
+
+    kernel=<path to vmlinux file>
+
+	This specifies the path to the vmlinux file.
+
+	Example:
+	kernel=vmlinux
+
+    initrd=<path to initrd file>
+
+	This specifies the path to the initrd file.
+
+	The file initrd.gz from coLinux installation upgrades your
+	kernel modules for this snapshot.  After first run of a new
+	coLinux version, you can remove this parameter from your config.
+
+	Example:
+	initrd=initrd.gz
+
+    mem=<mem size>
+
+	This specifies the memory size, assumes MB is the the
+	unit type, so 64 is same as 64MB. Default if you leave
+	this parameter out is 1/4 of your RAM if your RAM is >=
+	128, otherwise it's 16.  Default value is generally ok.
+
+    cocon=<COLS>,<ROWS>,<SCROLLBACK>
+
+	This specifies the console size. Default is 80x25x500. Minmum is 16x2,
+	maximal value for <ROWS> or <SCROLLBACK> is 500.
+	As separator can use 'x' or comma.
+
+	<SCROLLBACK> is optional and sets total lines in scroll back buffer,
+	usable with mouse weel or key Win+PageUp / Win+PageDown.
+
+	Examples:
+	cocon=120x40
+	cocon=120x40x500
+
+    cursor=<SIZE>
+
+	This option allows you to set the size of the cursor in the percentage.
+
+	Examples:
+	cursor=0   # Turn off cursor
+	cursor=100 # Set the cursor to the maximum size
+
+    color=<FOREGROUND>,<BACKGROUND>
+
+	Set the color '<FOREGROUND> on <BACKGROUND>' instead of the default
+	linux color 'gray on black'. Foreground and background colors can be
+	any of black, red, green, brown, blue, magenta, cyan, gray, darkgray,
+	brightred, brightgreen, yellow, brightblue, brightmagenta, brightcyan,
+	white.
+
+	Example:
+	color=yellow,black
+
+    cobdX=<path to image file>
+
+	Use any number <X> of these to specify the block device image file.
+
+	<path to image file> is typicali a filname of your image file,
+	for example the base root fs, you have extracted.
+
+	It automatically adds \DosDevices\ where needed.  Make sure you use
+	double-slashes in the situations where command shell escaping forces
+	you to (the @configfile needs no escaping).
+
+	If verbose output is anabled, coLinux prints more about the configured
+	and canonized device paths. In this case a "\DosDevice\C:\..." would
+	normal see as "\??\C:\..." - windows internal name.
+
+	<path to image file> can be also a partition using standard
+	\Device\HarddiskX\PartitionY format.  Harddisk starts by 0,
+	Partition starts by 1.  Be carefully with these accesses,
+	mount it read only at the first time and check the contains.
+	Don't mount a partition, where Windows is using in same time!
+	Partitions should only use non beginners to make a "dualboot"
+	runable.
+
+	Examples:
+	cobd0=rootfs.img
+	cobd1=C:\temp\swapfs.img
+	cobd2=\Device\Cdrom0
+
+    scsiX=<type>,<path to image file>,<image size>
+
+	Use any number <X> of these to specify the block device image file.
+
+	<type> is 'disk' or 'cdrom'.
+
+	<path to image file> is typicaly a filname of your image file,
+	for example the base root fs, you have extracted.  This can be an
+	image of disk (/dev/hda), instead the partition self (dev/hda1).
+	Linux kernel scans for partition tables, fdisk is usable.
+
+	<path to image file> can be a raw disk drive, with format
+	"\\.\PhysicalDriveX", where X starts with 0 for first harddisk.	Be
+	carefully with these configs, you risk datas on your drive C:.
+	Don't mount a partition that is in use on windows side!
+
+	<image size> can optional the size in megabytes. The host driver will
+	create the storage device file if it does not exist.
+	BE VERY CAREFULL  with this parameter, as it can increase/decrease the
+	size of a file as well!
+
+	For scsi0 the the device inside coLinux is /dev/sda, if type is cdrom
+	or the image file is a part of partition self (all current images).
+	If file has partition tables, the devices /dev/sda1, /dev/sda2, ...
+	are usable.
+
+	Examples:
+	scsi0=disk,file.img
+	scsi1=cdrom,file.iso
+
+    alias=<path to image file> | :cobdX
+
+	This makes life a lot easier. If you map an device node
+	directly - it would automatically allocate a cobd and
+	make an alias for it!
+
+	This syntax is similar to QEMU's syntax (it also has hda=).
+
+	<alias> is any of the linux typicaly harddisks (hda1, sda1, etc).
+	<path to image file> is the same as above.
+
+	Example:
+	hda1=rootfs.img		# (cobdX maps automaticly from first free)
+	hdc=\Device\Cdrom0	# CDROM as raw device. Mount as iso9660.
+
+	OR:  Device node aliasing.
+
+	The ':' tells the daemon that cobdX is not a pathname.  After you
+	have defined a "cobdX=..." priror, you can set an alias for this
+	codbX - read the next examples for understanding more.
+
+	Example:
+	cobd0=rootfs.img	# /dev/cobd0 is now the image file.
+	hda1=:cobd0		# /dev/hda1 and cobd0 are the same now.
+
+    cofsX=<path to windows directory>
+
+	Use any number <X> of these to specify a Cooperative Host filesystem
+	device (mount Host directory to coLinux	local mount point).  There
+	are some limitations with it, same as under Windows (':' colon and
+	'\' Backslash in names).
+
+	<path to windows directory> can be any of the directory of your
+	Windows.  BIG NOTE: Be carefully with full drives (C:\), because
+	coLinux has admin rights on this mount point.  Read-only-mount is
+	a good idea.
+
+	Examples:
+	cofs0=C:\coLinux	# (Directory)
+	cofs1=R:\		# (CDROM drive, USB drive etc.).
+
+	More about using cofs and mount options you will find in file cofs.txt
+	in your installation.
+
+    ethX=slirp | tuntap | pcap-bridge | ndis-bridge ,<options>
+
+	Use any number <X> of these to specify network interfaces.
+	The first argument select the interface type on host side,
+	follow by any more options.
+
+	Consult README.TXT about installation and use of network types,
+	and the page 'Network' in Wiki with lots of example combinations.
+
+	For all network interfaces can configure a <MAC>, if you wish a
+	constant hardware identification number.  Set six hex numers starts
+	with 02:xx:xx:xx:xx:xx as locally administered address.  Use different
+	numbers for every interfaces in your network environment.  Every MAC
+	should exist only ones per time in your network.  If <MAC> is not set,
+	colinux	builds a random number on every start.  This can be irritate
+	routers, dhcp cache tables and some udev based distributions.  It's
+	better to setting the MAC here.
+
+    ethX=slirp,<MAC>,<redirections>
+
+	Slirp, the simplest way to internet. It needs no changes or installs
+	on the Windows side.  Slirp sends and receives only TCP and UDP packets
+	to the current active adapater over the Windows API (WinSock).  You can
+	not send and not receice IMCP messages, this means ping and traceroute
+	dont't work.  To check your network you must use some other commands,
+	for example wget, ftp, etc.
+
+	Slirp works as "outgoing only" firewall from coLinux virtual machine
+	to the world.  In typicaly mode can not connect from outside to the
+	colinux guest.  Incommings can enable with the <redirections>.
+
+	BIG HINT: In firewalls on your Windows host should allow the outgoing
+	connections for the programm colinux-slirp-net-daemon.exe.
+
+	Use any number <X> of these to specify network interfaces.
+	<MAC> and <redirections> are optional.
+
+	Set a <MAC>, if you wish a constant hardware identification number.
+
+	<redirections> take the form tcp|upd:hostport:linuxport[:count],
+	multiple redirections are seperated by /, ie tcp:2222:22/tcp:8080:80
+	<Redirections> must begin with protocol ("tcp" or "udp") then an
+	":" seperator, the port on Windows host, followed by ":" seperator,
+	and the port for the coLinux guest.  Optional third ":" seperator
+	counts for port array.  More redirections have the same form and
+	are seperated by "/".
+
+	Examples:
+	eth0=slirp			# Simplest slirp mode (outgoing only)
+	eth0=slirp,,tcp:22:22		# Forwards SSH from host to guest
+	eth0=slirp,,tcp:2222:22		# Forwards 2222 on host to guest 22
+	eth0=slirp,,tcp:2222:22/tcp:4000:80:3	# Forwards counts of ports
+						# Host --> guest (coLinux)
+						# 2222 --> 22
+						# 4000 --> 80
+						# 4001 --> 81
+						# 4002 --> 82
+	eth0=slirp,02:00:00:00:00:01	# Configure MAC address
+
+	Inside coLinux use a DHCP-Client to get the parameters, or set static
+	parameters (hard coded, no others please):
+
+	# ifconfig eth0 10.0.2.15 netmask 255.255.255.0 broadcast 10.0.2.255
+	# route add default gw 10.0.2.2
+	# echo "nameserver 10.0.2.3" > /etc/resolv.conf
+
+    ethX=tuntap,<network connection name>,<MAC>
+
+	Tuntap is a private network between the coLinux and host only.  This
+	is the fastest network connection between Windows host and coLinux
+	virtual machine.  The network should be configured with a subnet area
+	that is not used on your Windows host on other adapters.  You can
+	route the tuntap to outside on the real network, but this is more
+	complicated and needs a network specialist for Windows and Linux.
+	Beginners should use tunetap only in the typicaly way as SSH login
+	or VNC network connection between windows host and coLinux guest.
+
+	Use any number <X> of these to specify network interfaces.
+	<network connection name> and <MAC> are optional.
+
+	<network connection name> is the name of TAP adapter, installed on
+	your host system, mostly named "Local Connection 1".  Without name
+	coLinux use the first TAP adapter.  Let the name empty, if you have
+	only one TAP driver installed.  Other TAP devices (from VPN) does
+	no interference here. If have more as one TAP (coLinux) driver
+	installed, then *must* set the name. Good idea is to rename the	network
+	connection inside windows networking overview into more readable
+	name, for example "TAP-coLinux".
+
+	Set a <MAC>, if you wish a constant hardware identification number.
+
+	Examples:
+	eth0=tuntap				# Use the first TAP device.
+	eth0=tuntap,"Local Area Network"	# You name it.
+	eth0=tuntap,,02:00:00:00:00:02		# Set a MAC address.
+
+    ethX=pcap-bridge,<network connection name>,<MAC>,<promisc>
+
+	Pcap-Bridge use an ethernet library to send and receice various
+	ethernet frames over your real network adapter card.  It's agents as
+	an additional network card on the one real exist card.  This allows
+	you, to connect coLinux virtual machine to the world.  In seeing from
+	outside your Windows host has an additional network card with a second
+	MAC, differ from your real card.  From coLinux machine you can do all
+	what you wand with an ethernet card (Ping, DHCP from router, TCP/IP,
+	IPX and many more protocols).  You must know: This type adds a virtual
+	network card in your network, and this not works in some IT security
+	policy.  Some wireless cards don't work with pcap-bridge, while the
+	MAC is differ on the same one connection channel.
+	Pcap-bridge does not work without a real netwoking connection.  This
+	means, you can not use this network type, if your real network adapter
+	is not connected (unplugged).
+
+	Use any number <X> of these to specify network interfaces.
+	<network connection name> must be a name of your real ethernet or
+	wireless card.  Use Quotation marks for spaces in name.  It is typical
+	"Local Connection". The name is optional, if have only pcap-bridge
+	interface (and no tuntap). If you have tuntap or more as one network
+	cards in your windows then please set the name here.
+
+	<MAC> and <promisc> are optional.
+
+	Set a <MAC>, if you wish a constant hardware identification number.
+
+	Default is 'promisc', Promiscuous mode allow to receive packets
+	that not directly adressed to that adapter (sniffing mode).  This
+	works for cable Ethernet adapters.  Some cases (Wireless cards) works
+	only with 'nopromisc'.
+
+	For this type of networking must install the Windows Packet Capture
+	Library "WinPcap.dll" from  http://www.winpcap.org/install/
+
+	Examples:
+	eth0=pcap-bridge,"Local Area Network"	# Uses PCAP bridging.
+	eth0=pcap-bridge,"Local Area Network",02:00:00:00:00:03,nopromisc
+						# Define a MAC address and
+						# disable the Promiscuous mode.
+
+    ethX=ndis-bridge,<network connection name>,<MAC>,<promisc>
+
+	Ndis-Bridge use kernel ndis library to send and receice various
+	ethernet frames over your real network adapter card.  It's agents as
+	an additional network card on the one real exist card.  This allows
+	you, to connect coLinux virtual machine to the world.  In seeing from
+	outside your Windows host has an additional network card with a second
+	MAC, differ from your real card.  From coLinux machine you can do all
+	what you wand with an ethernet card (Ping, DHCP from router, TCP/IP,
+	IPX and many more protocols).  You must know: This type adds a virtual
+	network card in your network, and this not works in some IT security
+	policy.  Some wireless cards don't work with pcap-bridge, while the
+	MAC is differ on the same one connection channel.
+	Ndis-bridge does not work without a real netwoking connection.  This
+	means, you can not use this network type, if your real network adapter
+	is not connected (unplugged).
+
+	Use any number <X> of these to specify network interfaces.
+	<network connection name> must be a name of your real ethernet or
+	wireless card.  Use Quotation marks for spaces in name.  It is typical
+	"Local Connection".
+
+	<MAC> and <promisc> are optional.
+
+	Set a <MAC>, if you wish a constant hardware identification number.
+
+	Default is 'promisc', Promiscuous mode allow to receive packets
+	that not directly adressed to that adapter (sniffing mode).  This
+	works for cable Ethernet adapters.  Some cases (Wireless cards) works
+	only with 'nopromisc'.
+
+	The difference between pcap-bridge is, that ndis-bridge works in a
+	kernel mode, no needs to install pcap library and is faster.
+
+	Examples:
+	eth0=ndis-bridge,"Local Area Network"	# Uses NDIS bridging.
+	eth0=ndis-bridge,"Local Area Network",02:00:00:00:00:04,nopromisc
+						# Define a MAC address and
+						# disable the Promiscuous mode.
+
+    ttysX=<serial device name>,<mode parameters>
+
+	Use any number <X> of these to specify serial interface (ttys0),
+	and host specific device name (COM1).  <mode parameter> sets
+	baudrate, data format and line disciplin.  Refer your host system
+	help (MODE -?) for more options.
+
+	Serial device supports only transmit and receice bytes.  Controls
+	(mode settings) are not supported from virtual machine side.  Inside
+	coLinux can only run with one baudrate and mode from startup setting.
+
+	Examples:
+	ttys0=COM1	# Connects the serial device /dev/ttyS0 from linux
+			# to host system COM1.  Please set the line
+			# parameters for serial port on hostsystem,
+			# before colinux starts.
+
+	ttys0=COM1,"BAUD=115200 PARITY=n DATA=8 STOP=1 dtr=on rts=on"
+			# Sets many more default parameters for the serial
+			# port.  Please refer you manual or help system of
+			# host system for optional parameters ("MODE /?").
+
+    execX=<executable program>,<parameters>
+
+	Use any number <X> of these to specify order of launching a
+	program and terminamte at stopping linux.  Use Quotation
+	marks, if more as one parameter.
+
+	Example:
+	exec0=C:\Programs\Xming\Xming.exe,":0 -clipboard -multiwindow -ac"
+			# Program Xming.exe runs at start of colnux and
+			# terminate it, if colinux is shutting down.
+
+    root=<root device>
+
+	This is the device (as coLinux gues sees it) to the root
+	device.
+
+	Of course we need to pass root= to the kernel.
+
+	Example:
+	root=/dev/cobd0
+
+    ANY additional parameters are passed to the coLinux kernel as is
+    (unmodified) kernel boot parameters.
+    For example "init 5" runs linux on specific runlevel.
+
+    See the file "example.conf" in your colinux installation directory for
+    full example.
+
+
+Environment settings
+--------------------
+
+    COLINUX=<Install path>
+
+	Installer sets the path to your coLinux installation in environment
+	for all users.
+
+    COLINUX_CONSOLE_EXIT_ON_DETACH=1
+
+	If this set, then colinux FLTK/NT console will be close after
+	shutting down and detach coLinux.
+	This is good option for closing console after linux shutting down.
+
+    COLINUX_CONSOLE_FONT=<Windows Font Name>:<Size>
+
+	Set the font type and size for FLTK console.  Only fixed fonts
+	are allowed.
+
+	Example:
+	set COLINUX_CONSOLE_FONT=Lucida Console:12
+
+	Change font size only.  Default font "Terminal" is still active:
+	set COLINUX_CONSOLE_FONT=:12
+
+    COLINUX_HOST_IPADDR=<Windows IP address>
+
+	Set the host ip address for SLiRP emulations.
+	Currently this is used for the PORT command in "active FTP" sessions.
+	This only needs, if you have more as one network adapter and SLiRP
+	detects the host address wrong. For example, if any TUN/TAP device
+	is in first place of "ipconfig.exe" and the first adapter is not
+	your connection you want to use.
+
+    COLINUX_NO_CPU0_WORKAROUND=Y
+
+	Currently exist a problem on some CPUs with a very huge traffic of
+	interrupts (200,000 or more interrupts per second). In such case we
+	have not enough time for switching between Linux and Windows, because
+	we only have to handle all these interrupts. Typically coLinux have no
+	text in FLTK-Console and boot steps ends after these lines:
+
+	    Setting proxy interrupt vectors
+	    PID hash table entries: 2048 (order: 11, 8192 bytes)
+
+	With 'COLINUX_NO_CPU0_WORKAROUND=Y' coLinux never use first processor.
+
+	This lets the Host handle most of interrupts without switching between
+	coLinux and Host. The result is, that the system runs more smoothly,
+	and the problem above goes continue to run.
+
+    COLINUX_NO_SMP_WORKAROUND=Y
+
+	Currently there's a bug on SMP that prevents coLinux from running
+	stable unless it is pinned to the first processor.
+
+	With 'COLINUX_NO_SMP_WORKAROUND=Y' coLinux runs on all processors.
+
+
+Used keys in Windows Registry
+-----------------------------
+
+# Automatic generated MAC, monitor number 'M', network device index 'X'
+[HKEY_CURRENT_USER\Software\coLinux\monitor\M\ethX]
+"mac"="00:ff:XX:XX:XX:XX"
+
+# Font type, font size, copy mode and exit at detach for console FLTK
+[HKEY_CURRENT_USER\Software\coLinux\console\Font]
+"Size"=dword:000000012
+"Font"=dword:0000000d
+"CopySpaces"=dword:00000000
+"ExitDetach"=dword:00000000
+
+# Debug level for kernel driver load
+[HKEY_LOCAL_MACHINE\SOFTWARE\coLinux]
+"Debug"=dword:0000001f
+
+# Message file for event logging, if running as service
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Eventlog\Application\coLinux]
+"EventMessageFile"="C:\coLinux\colinux-daemon.exe"
+
+
+Special keys in consoles
+------------------------
+
+    FLTK console:
+
+	Win+C
+	WinKey+Home		copy selected text into clipboard buffer
+
+	Win+V
+	WinKey+End		inserts text from  buffer (copy & past)
+
+	Win+PageUp
+	mouse wheel up		Scroll back console
+
+	Win+PageDown
+	mouse wheel down	Scroll down console
+
+    NT console:
+
+	Ctrl+Alt+Shift+Del	sends Ctrl+Alt+Del to Linux
+
+	Win+LeftAlt		detach from colinux

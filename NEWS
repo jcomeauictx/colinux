@@ -1,0 +1,721 @@
+* Version 0.7.9
+  Bugfixes:
+  * Bug #1780633: Skip negative timestamp glitches from QueryPerformanceCounter.
+  * Bug #3071698: Replace co_div64 with more accurate div64_32 from linux-2.6.33.5
+  * scsi: Reading disk from offset at 1TB and above was faulted with
+    end_request: I/O error, dev sda, sector 2147483648
+  * scsi: Set scsi_level = SCSI_SPC_2, supress warning "READ CAPACITY(16) failed".
+
+  Kernel:
+  * Update Linux kernel to 2.6.33.7
+  * Change CONFIG_REISERFS_FS as compiled in, instead as module.
+  * Enable CONFIG_SERIAL_COOPERATIVE(_CONSOLE) for serial boot console.
+  * Enable CONFIG_KEYS (FeatureReq #3094228).
+  * Enable more file systems: ADFS_FS, AFFS_FS, ECRYPT_FS, HFS_FS, HFSPLUS_FS,
+    BEFS_FS, BFS_FS, EFS_FS, VXFS_FS, HPFS_FS, QNX4FS_FS, UFS_FS, NFSD_V4.
+  * Enable new CIFS features: CIFS_WEAK_PW_HASH, CIFS_UPCALL, CIFS_XATTR,
+    CIFS_POSIX, CIFS_DFS_UPCALL, CIFS_EXPERIMENTAL
+  * Serial: Remove worker thread. Simple direct post chars in tty buffer,
+    remove semaphores and race conditions. (Suggest by Paolo Minazzi)
+
+  Buildsystem:
+  * Fix various build bugs and warnings under Linux as Host.
+  * Fix kernel build error "mixed implicit and normal rules" with make 2.83
+
+* Version 0.7.8
+  FLTK Console (Shai Vaingast):
+  * New: Select font style and size with menu, store current font in registry.
+  * New: Setect text with right or left mouse and copy&paste with key Win+C.
+  * New: "cocon=COLSxROWSxSCROLLBACK" to use console scrollback with keys
+    Win+PageUP, Win+PageDown or mouse weel.
+  * Disabling console FLTK resize functionality.
+  * Enabled blinking cursor support.
+  * New menu option "exit on detach" (quit console after shutting down).
+  * Redesigned menu to be more inline with today's standard menu layout.
+  * Workaround for some Vista keyboard drivers bugs where WinKey+C and WinKey+V
+    don't work properly.  Now WinKey+Home and WinKey+End is the alternate.
+
+  Daemons:
+  * Different descriription for file properties, add original filename.
+
+  Kernel:
+  * Version 2.6.33.5 added.
+  * Filesystems EXT4 enabled in kernel, GFS2 enabled as module.
+  * comouse.c: Fix build error, with CONFIG_MOUSE_COOPERATIVE. (Yin Sun)
+  * Version 2.6.22.18 removed from patches and config. Cleanup patches.
+    Softlink arch/i386 --> arch/x86 for patches removed.
+
+  Buildsystem:
+  * Suppress warnings from Python 2.6. (Shai Vaingast)
+  * Config variable changed from SOURCE_DIR to DOWNLOADS.
+
+  Updated libraries and tools:
+  * FLTK 1.1.10, fixes problems with Window border frame on Vista.
+
+* Version 0.7.7.1
+  Kernel 2.6.25.20 and 2.6.26.8:
+  * Bug #3021253: Hang/Crash with memory size not bounding on 4MB.
+
+* Version 0.7.7
+  Console and daemons:
+  * New: "color=black,white" sets default color. (Peter Kuznetsov)
+  * New: "cursor=1..99" sets cursor size of nt-console. (Peter Kuznetsov)
+  * TAB as separator in command line args. (Peter Kuznetsov)
+  * Suppress "<d>" KERN_DEFAULT and "<c>" KERN_CONT on daemon printk output.
+
+  Kernel:
+  * Version 2.6.26.8
+    o ext4fs enabled as module, backport patch 2.6.26-ext4-7 added.
+      Please read about using ext4 in kernel 2.6.26:
+      http://ext4.wiki.kernel.org/index.php/Ext4_Howto#For_people_who_are_running_Debian
+      (Thanks Frédéric L. W. Meunier)
+    o Squashfs 3.4, Unionfs 2.5.4, Cloop 2.628
+  * Version 2.6.25.20
+  * CONFIG_SYSFS_DEPRECATED: Disabled. Newer udev don't like it. (El Topo)
+  * scsi: Fix "unhandled opcode 51" (GPCMD_READ_DISC_INFO) for DVD/CDROM.
+
+  Buildsystem / sources:
+  * Source format cleanup. (Peter Kuznetsov)
+  * premaid.sh moved into bin directory.
+
+  Updated tools:
+  * binutils 2.19.1
+
+* Version 0.7.6
+  * Bug #2895531: "mkfs.ext3 freezes on scsi disks" fixed by limit number
+    of entries in scsi queue from 73 to 32, and changed type from Critical-
+    into DelayedWorkQueue.
+  * Bug #2890857: Fixed panic "COSCSI: response: use_sg (2) > 1".
+    Walking thought scsi scatterlist with more as 1 segment now.
+  * Bug #2893343: VMALLOC_END was overlapping coLinux shared host memory.
+    If user used mem=1000, then this crashed Linux kernel or the host.
+    Maximal guest memory limit is 984 MB, host driver will adjust it now.
+  * Bug #2911886: Move file to subdirecory was blocked under cofs.
+  * Bugfix pci device list. conet0 was missing in bootlog sometimes.
+
+  Console:
+  * FLTK: Fix buffer overflow for option cocon=x*y with x > 256 columns.
+
+* Version 0.7.5
+  * Bug #1959846, #2760666: Don't crash the host, if an other virtualization
+    runs in VMX mode.
+
+  Network:
+  * Bug #2849262: SLiRP: Active FTP failed with "500 Illegal PORT command".
+    Environment COLINUX_HOST_IPADDR overwrites auto detected host ip address.
+
+  Console and daemons:
+  * Insert keys from fltk console without keyboard mapping. (Paolo Minazzi)
+  * New: NT console WinKey+V paste keys from clipboard. (Vladislav Grishenko)
+  * Linux as host: Handle extended keys, for example ALT+CurRight.
+  * Automatically add network dependency to coLinux as service.
+  * Version informations about binutils and SVN revision added to daemon file.
+
+  Kernel:
+  * Remove floating point handling from passage page code. FPU save/restore
+    only on demand and only inside Linux guest kernel, if Linux kernel or Linux
+    userland needs the FPU. In cases where FPU was not used on Linux guest side,
+    the registers of FPU are not touched. That saves some time between operating
+    system switches. It's 1 percent (or less) faster now.
+  * Increase CO_LINUX_API_VERSION to 13, avoids crashes with older builds.
+  * cloop updated to version 2.625
+  * Forward plain text panic message instead "terminated with code 3".
+
+  Buildsystem:
+  * Bug #2847393: Configure detected wrong program versions. (Steven Chen)
+
+  Updated libraries and tools:
+  * w32api 3.13
+
+* Version 0.7.4
+  Filesystem:
+  * New: cofs rename allows to overwrite files with ReadOnly attrib.
+  * New: cofs supports flat file modes "rwx" for owner.  Mount option
+    "noattrib" disables these attribute mapping for older compatibility.
+  * Use "setcobd=async" to enable asynchronous mode for cobd devices.
+  * Bug #2013435: cobd supports read-only files now.
+  * Bug #2152550: cofs atime and mtime was swapped on time set.
+  * Bug #2176188: File sync wrong on cofs, command after mv/rename fails.
+
+  Network:
+  * pcap-bridge: Fix suspend problems. Reconnect after loosing adapter.
+  * New network "ndis-bridge" works in kernel mode and is the faster
+    alternative to pcap-bridge. (Ligong Liu)
+  * Bug #1396539: Fixing the "eth0: duplicate address detected!".
+    New filter rule for ndis-bridge and pcap-bridge is:
+    "(ether dst MAC) or (multicast and not ether src MAC)"
+  * Bug #2055697: Crashing SLiRP under heavy usage ktorrent. (Shai Vaingast)
+  * Bug #2357494,#2365031: ndis-bridge was not working with PPPoE, AoE
+    and others types as IP and ARP packets. Type filter removed now.
+
+  Console and daemons:
+  * New: Added "cocon=COLSxROWS" to use console size, other than 80x25.
+  * Bug #1117788: Fix sticky ALT after system menu from ALT-Space.
+  * Bug #2013501: Stop with error message on empty parameters.
+  * Bug #2593186: FLTK console command prompt display problems. (Shai Vaingast)
+  * Bugfix: Enclose spaces in current directory for install-service.
+
+  Kernel:
+  * scsi: New device for images with partition tables and works async.
+    Usage "scsi0=disk,file.img" or "scsi1=cdrom,file.iso" (Steve Shoecraft)
+  * Added virtual pci device handling. "lspci" is working (Steve Shoecraft)
+  * Add PG_co_host_mapped, save many OS switching times: speed up coLinux.
+  * New: /proc/colinux/stats show counts of OS switches.
+  * unionfs-2.2.4 added as module. (Marwan Al-Sabbagh)
+  * Add sysenter / sysexit restoration support, for cpu with SEP feature.
+  * Bug #2524658: GPF on raid5/6 md array by accessing MMX/XMM-registers.
+  * Feature req #2114493: Add iscsi kernel support (CONFIG_ISCSI_TCP).
+
+  Installer:
+  * New images: Fedora 10, Ubuntu 7.10
+
+  Debugging:
+  * Enable host kernel debug via registry [HKLM\SOFTWARE\coLinux] "Debug"
+
+  Updated libraries and tools:
+  * mingw 3.14
+  * w32api 3.11
+
+* Version 0.7.3
+  Bugfixes:
+  * Check ELF header before accessing kernel vmlinux (fix exception).
+  * Fix problems with memory hole from shared video cards and the
+    error message "PFN to high".
+  * Bugfix host freeze after "Using IPI Shortcut mode" and other randomly
+    crashes at mounting the root file system with types ext2 or ext3.
+
+  Daemon:
+  * Add build date to exe file properties.
+  * View build timestamp of ntkernel driver with --status-driver.
+  * Bug #1861876: Random created MAC stored in Registry to have same on
+    every start. [HKCU\Software\coLinux]
+  * Bugfix: Image files >=4GB fails with size error on parameter "-v 3".
+  * Workarround for unresponsive key inputs on Vista flooded nt-console.
+    Linux driver will sleep now, if message queues have to many entries and
+    user task is busy. Network daemons drivers changed also into this mode.
+  * Incrase NT console screen to most as can without scrollbars at startup.
+
+  Kernel:
+  * Kernel has been updated to 2.6.22.18
+  * Kernel config added: More Netfilters (NF_NAT and more), Network Security
+    Marking, RAID and LVM as module (MD), extended attributes for ext2/ext3/
+    reiser/jfs/xfs, Quota, Kernel automounter support, eCrypt filesystem,
+    and more...
+  * Removed: KALLSYMS_ALL (Debugging symbols)
+  * SELINUX support. To enable, set selinux=1 in colinux.conf
+  * Fix for splice local root exploit is included, details on
+    http://www.kernel.org/pub/linux/kernel/v2.6/ChangeLog-2.6.22.18
+  * Feature Requests #1421120: Fixup "vim fsync" error on cofs.
+  * Bugfix get_size for double opened block devices.
+  * Fix BSOD on "stty rows N" where n>25. Disable resize. (Paolo Minazzi)
+  * Bugfix: CR3 wrong converted for register dumps inside page fault handler.
+
+  Installer:
+  * Update image ArchLinux-2007.08-2
+  * Text '* Notes' sometimes was only shown as '*', adjust field sizes
+  * Feature Requests #1898468: expose install folder as variable %COLINUX%
+
+  Buildsystem:
+  * New option --errfile use different file for stdout and stderr.
+
+* Version 0.7.2
+  Bugfixes:
+  * #1324092: cofs rename replace existing file.
+  * #1791993: Ship modules with root as owner and group.
+  * #1853578: memory usage limit: 0 MB on machines with 4 GB RAM.
+  * Fix cofs chdir with wildcards on existing upper/lower directory.
+  * Don't drop last char from config, if last line no ends with CRLF.
+
+  Console and daemons:
+  * New menu entries in FLTK console
+    Power off: Fast power down coLinux kernel. Without file sync!
+    Reboot:    Sends ctrl-alt-del, init process goes into runlevel 6
+    Shutdown:  Calls "/sbin/shutdown -h now" with fallback to "/sbin/halt"
+               Shutdown will automatic call from stopping as service,
+               or if user clicks close on the colinux-daemon.
+  * New: "colinux-daemon -p pidFile" stores ID of coLinux in file pidFile.
+    "colinux-console-fltk|nt -p pidFile" attach the monitor from stored
+    ID.  With this mechanism can open a /named/ console without knowing
+    the current ID (Process ID).  pidFile will removed on normal shutdown.
+  * Network daemons TAP, Bridged and Slirp runs with process priority high.
+  * Added a nice colinux 3D logo image to the "About" box (Nlucas)
+  * Stop with error, if double defined device (cobd,cofs,eth,exec)
+  * Optimized workaround for DEP/noexecute problems (flush tlb).
+
+  Kernel:
+  * Kernel has been updated to 2.6.22
+    (Thanks to Anders Eriksson for 2.6.13, 2.6.14, 2.6.15)
+  * Holds multiple kernel versions in patch series files
+    (2.6.12, 2.6.13, 2.6.14, 2.6.15, 2.6.17, 2.6.22)
+  * cloop updated to 2.06 (compressed loop blockdevice from Knoppix)
+  * Hotplug enabled, udev usable
+
+  Installer:
+  * Text was to big for description box in installer. [Bugs item #1819219]
+  * Add Ubuntu 6.06.1 to images page. Update image Fedore 7. Add web link
+    to Notes for each image. Link to 'other images on SF' clickable now.
+  * Un-/Installer checks a running coLinux before overwrite or remove old
+    files.  [Bugs item #1396459, #1549148]
+  * Uninstall old colinux with old exefile, path from registry uninstaller
+    [Support Requests-1553923]
+  * Update tapinstall.exe (alias devcon) from DDK 3790.1830 (Mar 24 2005)
+  * Block installing on 64 bit systems.
+
+  Buildsystem:
+  * Linux as host: Restructed build of colinux.ko, use kbuild system
+    from host. Host with regparm=3 is usable (tested host 2.6.22).
+  * Linux Kernel and daemons can build with differ gcc versions now.
+    ABI is runtime checked.
+    Usable gcc for kernel: 3.4.x, 4.0.x, 4.1.x, 4.2.x up to 4.3.0
+  * Warnings from gcc 4.x fixed.
+
+  Debugging:
+  * New: Debugging.txt with hints for debugging colinux start problems.
+  * Option "-v level" enable verbose messages and debug prints on console.
+  * colinux-debug-daemon: Only connect to driver, if args -s settings.
+  * Leveled debug output to Dbgview.exe (www.sysinternals.com).
+    Needs to enable facility/level with colinux-debug-daemon before.
+
+  Updated libraries and tools:
+  * gcc 4.1.2 (unpatched now, not from mingw)
+  * binutils 2.17.50
+  * mingw 3.11
+  * w32api 3.9
+  * WinPcap 4.0.1
+
+* Version 0.7.1
+  * colinux-daemon:
+    - Obsoleted the use of XML files for configuration.
+      XML config files have been removed.  Use the command-line 
+      syntax in a name=value per line plain text file instead.  Please
+      read syntax from colinux-daemon.txt and view into the file
+      example.conf in coLinux install directory.
+    - Added support for @ at the command line for passing simple
+      configuration files.
+    - Added '-k' option to suppress kernel messages on boot. This should
+      let you watch other daemon's output more easily.
+    - Incrase the maximum numbers of monitors from 16 to 64.
+    - Warn about double configured index for cobd, eth, cofs, ttys, exec.
+    - Print human readable error, if wrong linux.sys installed.
+    - Return errorlevel procedures (return from running, --install-driver,
+      --status-driver, ...)  Errorcodes: 0=OK, 3=driver version mismatch,
+      14=driver no installed, 255=general fail (-1)
+    - New: "execX=..." in configuration, launch external programs.
+    - Bug fix: Quotation marks detection in config file and args, samples:
+      eth0=tuntap,"LAN-Connection 14",00:11:22:33:44:55
+      cofs0="C:\My files"
+    - New: "ttysX=..." in configuration, launch coserial daemon.
+      Internaly parameters "-f DeviceName -m Mode" for colinux-serial-daemon.
+      Serial daemon is light usable under WinNT, you can login on /dev/ttyS0
+      or redirect serial communication port (COM1 for sample).
+    - Workaround for Xeon and P4 with DEP/noexecute problems (flush_tlb).
+  * Console:
+    - "set COLINUX_CONSOLE_EXIT_ON_DETACH=1" to close FLTK/NT console
+      after shutting down and detach coLinux.
+    - Menu Monitor Select is usable to select ones from running instances.
+  * Service running:
+    - Shutdown the service, if Windows is shutting down.
+    - All files and config file no longer needs absolute path names on
+      '--install-service'.  Working directory stored for service run later.
+  * Kernel:
+    - has been updated from 2.6.11 to 2.6.12
+    - Bug #1479042: Ignore bootparm "no387", while no emulation is enabled
+    - Bug #1665812: Disable /proc/kcore from kernel config.
+      Reading from this file would crash host system.
+    - Bug #1643371: BSOD from dmidecode, fixed by disallow mmap on /dev/mem.
+  * Updated libraries:
+    - MinGW from 3.7 to 3.9
+    - w32api from 3.2 to 3.4
+    - WinPcap from 3.1-beta4 to 3.1
+    - FLTK from 1.1.4 to 1.1.6
+    - Remove all XML libraries from source
+  * Installer:
+    - Add new images ArchLinux and FedoraCore5.
+    - Gentoo image updated.
+    - Add locations Australia and SouthAmerica
+    - Used NSIS version 2.22
+  * initrd:
+    - Automatic use cofs31 as path to file vmlinux-modules.tar.gz.
+    - Print error on console, if initrd can't load.
+    - Bugfix: 'root=/dev/...' must no longer the first bootparm for initrd.
+  * cofs:
+    - Break out the limit of filename length.  Basename length up to
+      255 chars.  Fullpath is limited by path depth of 256 directories.
+    - Bug #1151757: COFS disallow mutiple mounts.
+    - Bug #1190080: Fix cofs file time/mode/flags after touch or write.
+    - Fix mmap read error behind end of file (was not zero filled).
+  * TAP-Win32 device driver
+    - version 8.4 update from openvpn-2.1_beta15a
+    - usable without admin rights
+    - fixed crashing Vista
+    - connection speed status 100 MBit/s (show/view only)
+    - 'Check for truncated IPv4 packets' diabled
+    - without linker debug symbols, without runtime debugging
+  * pcap/Bridged:
+    - Allows empty name for autosearch a connected LAN interface.
+  * slirp:
+    - SLiRP is the first choice of colinux networking types (easy setup).
+    - Multiple redirection as parameter ':count'
+      (Thanks to Bernd Brandstetter)
+    - UDP receive Buffer incrase to 32K (win32 default was 8K),
+      maximal size of a packet is 32767 bytes now.
+      (Thanks to Bernd Brandstetter)
+    - Incrase TCP MSS from 512 to 1460 bytes.
+    - Remove honypot ports 517, 518 and 7648 from udp listen.
+      talk and Cu-Seeme are not implement, still remove the table mow.
+    - Runtime debug code disabled.
+    - Mac is usable as config.
+  * Introduce a new build system:
+    - Target kernel dir splitt into source and objects.  New params
+      --targetkernelsource and --targetkernelbuild as replacement for
+      the obsolate --targetkerneldir for configure.
+    - Allow to use ccache (http://ccache.samba.org/).
+    - Use quilt for kernel patches, if quilt installed, fallback if not.
+    - 'make package' creates one zip archive with and an other without
+      debugging symbols.  The zip with symbols only will no more create.
+    - New param --gcc-guest-build for configure: Creates the kernel gcc
+      from source of cross gcc, if your system has an incompatible gcc.
+    - New parameter --verbose for configure.
+    - Python bin/make.py colinux:
+      o Automatic awareness of changes in header files.
+      o Doesn't require 'make clean' between compilation of
+        different coLinux ports.
+      o Clean, flexible and easier to maintain.
+  * Add icons to the other executables.
+  * Linux as host: More positive tested host kernels: 2.6.17, 2.6.18
+  * Wiki moved from wiki.colinux.org to http://colinux.wikia.com
+
+* Version 0.6.4
+    * Resolved SF Bug #1517979 and #1551076 - colinux-bridged-net-daemon.exe
+      and other net daemons crashes under heavy load. (Mitch Bradley)
+    * colinux-daemon: Fix incorrect explaination in --help, for --remove-driver.
+      SF Bug#1483449
+    * Improved building
+        * improvements to cut down on disk size needed to build coLinux
+        * improvements to make process smoother and better handle some errors
+    * Fix do_wp_page: bogus page at address <address> (mainly seen with syslog)
+      when linux is host
+      Thanks to Robert for >=2.6.13 part (2006-02-26) and Bernd Brandstetter
+      for 2.6.12 (2005-10-01).
+      Tested host kernels:
+      2.6.10, 2.6.11, 2.6.12, 2.6.13, 2.6.14.4, 2.6.15, 2.6.16-rc5
+    * Fix daemons to read more than one message
+    * Fix for dropped UDP/TCP packets between linux and host daemons.
+    * cofs and cobd:
+        * Allow relative paths in XML (except for \Device & \DosDevices)
+        * Remove trailing backslashes from cofs paths
+        * Improve console output of mapped devices & paths
+        * Case insensitive scans for duplicate paths
+    * cobd:
+        * Fix for reference to NULL-Pointer
+    * cofs:
+        * Fix BSOD for long non-ansi names in directory
+          (Thanks to Kensuke Matsuzaki)
+        * Fix for handling longer basenames (from 127 to 255)
+    * slirp:
+        * Handle larger UDP/TCP packet (more than 3000...4000 bytes of user data
+        * Fix realloc problem that caused slirp to crash
+          (Thanks to Bernd Brandstetter for finding it)
+        * Always set destination address and port, destination port is not
+          always the same
+          (Thanks to Bern Brandstetter for finding & submitting patch)
+        * bind 10.0.2.2 to Window's localhost, instead of window's LAN adapter
+        * Packets from Windows host are translated to 10.0.2.2,
+          other packets are routed but not translated
+        * Slirp redirection now works without any real network adapter
+        * Fix Slirp redirection to work on LAN if colinux started before LAN is
+          connected
+    * pcap/Bridged:
+        * Add promisc="false" in config.xml, or 'nopromisc' as last command-line
+          argument
+          (ie, eth1=pcap,"Local Area Connection","<FAKE MAC>",nopromisc ).
+          Default is Promiscuous on.
+
+* Version 0.6.3
+  * Fixed "VFS: Cannot open root device" after installation modules from
+    initrd (linuxrc). Mostly on jurnaled filesystems such reiser or ext3.
+  * Automatic find interface, if name is empty for winpcap bridged.
+  * Resolved SF Bug# 1235993 - Crash if find or locatedb runs on cofs.
+  * Fixes issue with Services being killed during Windows Shutdown,
+    instead of Windows waiting for the Service to shutdown properly.
+  * Fixes for memory size that are not a multiple of 4 (caused crashes).
+  * Improved console i/o peroformance (especially on XP)
+  * Resolved SF Bug# 1117510 - README file lacks information.
+  * Resolved SF Bug# 1117511 - coLinux exits with our error message when
+    given a bad ethX command-line argument.
+  * Restricted access to /dev/mem & /dev/kmem (fixes some udev and
+    install program problems)
+  * Add CTRL-ALT-SHIFT-DEL to do an CTRL-ALT-DEL in NT Console
+  * Added Unicode name support to cofs
+  * Fixed problem with cofs, where creating a directory caused a crash
+    of Windows.
+  * Made error messages slightly more friendly.
+  * Optimized a little bit for non-PAE machines.
+  * Fixed issue with reboot when doing a rename on cofs.
+  * Kernel has been updated from 2.6.10 to 2.6.11 to fix console
+    slowness, in addition some patches to 2.6.11 to fix problems with crashes.
+  * Synced several linux files for linux host builds to winnt files
+    for winnt host builds.
+  * build scripts now use POSIX shell syntax.
+  * Max Memory upted to 1000MB & tested.
+  * Fixed problem with cofs, where doing "df" on Win2k caused 100% cpu
+    usage.
+  * Updated slirp code, slirp is now a very stable network option.
+  * FLTK console's font name and size can be specified by an environment
+    variable (only allows fixed width fonts):
+    set COLINUX_CONSOLE_FONT=Lucida Console:12
+  * Added "sdo" to scsi aliasing.
+  * Lots of other document, little bugs, etc...
+
+* Version 0.6.2
+  * The entire configuration can be passed on the command line instead
+    of using an XML file (working towards UML compatibility). Read
+    doc/colinux-daemon.
+  * Linux patch ported to Linux 2.6.8. Linux 2.4.x will not be
+    officially supported anymore. (Dan Aloni and George Boutwell).
+    If you use an old root file image you might need to fix it,
+    read about moving to 2.6.x in the Wiki site
+    (http://www.colinux.org/wiki/)
+  * Implemented a Cooperative file system driver in Linux, that
+    makes it possible to mount host OS directories in Linux, similar
+    to UML's hostfs. It lets you access your C:\ without using
+    Samba or other network file systems. Read doc/cofs.
+  * coLinux should now work under PAE setups and AMD64 setups that
+    enable the NX bit (specifically, Windows XP SP2).
+  * The slirp network daemon was added. This network daemon provides
+    easy-to-set-up outbound network communication from coLinux
+    without using the TAP driver or PCAP library.
+  * initrd support was added (teesoft2004 at yahoo.com.cn).
+    To activate it you can specify e.g. <initrd path="..." /> in the
+    configuration, or initrd=filename in the command line.
+  * Bug fix: Reception and delivery of network packets bigger than
+    2kb.
+  * Bug fix: Consoles and/or other daemons fail to connect to
+    colinux-daemon on startup (this is Windows only).
+  * Bug fix: Stop reboots where different gcc compiler versions are
+    used to compile linux.sys & vmlinux, with an error/warning
+    (George Boutwell).
+  * Bug fix: Proper floating point state preservation in the Linux
+    guest. coLinux now passes the flops20 test program.
+  * Bug fix: A tiny memory leak when coLinux is shutting down.
+  * Bug fix: Proper reference counting of the driver in the Linux
+    port.
+  * Bug fix: The network driver (conet) now verifies checksums (as
+  * Changed PCAP handling to use Connection Name instead of
+    Adapter/Device/Driver name. Name is now uniform between PCAP &
+    TAP and multiple devices of the same/make/model should be able
+    to be connected to. (George Boutwell)
+  * Support AltGr for both FLTK & NT consoles. (Sascha Kettler)
+  * Added a coserial deamon (only Linux for now), that allows one
+    to open a serial terminal to the guest machine. (You can run
+    /sbin/mgetty ttyS0, etc.)
+  * Improved debugging - we now have a debug messages "collector"
+    deamon named colinux-debug-deamon, which collects debug messages
+    from all the coLinux components. This also changes the way things
+    are printed when you run the daemon (it is now easier to see
+    what belongs to what). All debug messages are off by default,
+    so things may go a little faster.
+  * An API version number was added to make sure that you use the
+    right vmlinux and user-space executables with the right coLinux
+    driver (previously it caused crashes if the APIs changed).
+  * Added block device aliasing, e.g alias="hda2". You can specify
+    such an alias in the <block_device> element in the configuration
+    XML and expect coLinux to mount it, even when passed with root=.
+    NOTE: The cobdX device and its alias are mutual exclusive, which
+    means that you can't mount both of them at the same time. 
+  * Implemented a new timer for the Linux guest, this should fix
+    time-going-back issues.
+  * Improved message passing, which may boost networking a bit.
+  * Win32-TAP driver upgraded to version 8.1. This version doesn't
+    bring any changes to the actual driver code. However it was
+    released in order to notify the other projects that bundle the
+    TAP driver along with their software, to modify the name
+    identifer of the driver so that multiple TAP driver users can
+    coexist (e.g, OpenVPN with coLinux). Therefore, coLinux now
+    installs its TAP driver as TAPxxxxco (where xxxx is the
+    driver version).
+    After installing it, you will notice " (coLinux)" appended to
+    the device name in the Network Connections manager. The old
+    driver will remain until it is uninstalled.
+  * If the MAC address is unspecified, a random MAC is choosed 
+    using the familiar TAP prefix (00:FF:XX:XX:XX:XX).
+  * Enhanced coLinux keyboard handling support (sends raw scan codes
+    from Windows to linux) (Nuno Lucas).
+  * Change memory allocation so that the RAM for the VM is not
+    allocated on startup, but on-demand. This means the coLinux
+    loads faster and less prune to memory allocation failures
+    in the host.
+
+* Version 0.6.1 
+  * Multiple virtual NICs are supported (eth1, eth2, etc...).
+  * Some small bugfixes.
+  * Added the ability to send Ctrl-Alt-Del to the Linux machine.
+  * Linux patch updated to 2.4.26
+  * Linux port (for systems running kernel 2.6.x)
+  * Fixed a crash that could happen on swapoff().
+  * Initmem is freed (no more 'missing implementation')
+  * The number of maximum cobd block devices was increased to 32.
+  * The daemon process is pinned to the first processor until
+    we get the SMP stability issue fixed.
+  * Time is not going backward for gettimeofday() users anymore.
+  * Support for running more than one instance of coLinux is now functional.
+  * No port I/O allowed from userspace: the guest Linux can't change the host's
+    clock, and it also fixed crashes that were caused by trying to run X.
+  * Windows: 
+    * Sizes of raw partition devices are now detected properly. This
+      means that the resierfs problems should be over, plus cat /dev/cobd*
+      would work for you.
+    * Suspension of the host machine won't cause colinux-daemon problems like
+      memory leaks.
+    * The daemon can install itself as a service (Jaroslaw Kowalski).
+      Stopping the service sends Ctrl-Alt-Del to let the Linux VM
+      shutdown cleanly.
+    * The daemon can install the linux.sys driver separately from its run,
+      which can allow you to run coLinux as any user that have access to
+      the installed driver (Daniel R. Slater).
+    * coLinux now builds using MingW32 and no longer depends on cygwin1.dll.
+    * Added scripts for building the MingW32 cross compiler on Linux,
+      plus scripts that download, compile, and install the libraries
+      coLinux depends on.
+    * The name of the TAP device to use can be specified with the
+      'name' attribute in the XML. NOTICE: The name is matched against
+      the string that appears in Network Connections (e.g., 'Local Area
+      Connection') and not the device name assigned by Windows (e.g.,
+      'TAP-Win32 Adapter')
+    * The driver is installed from the daemon's installation directory
+      rather than from the current running directory.
+  * Linux port:
+    * Sending SIGHUP to the daemon causes it to issue Ctrl-Alt-Del on the
+      Linux VM.
+  * Consoles:
+    * Fixed a bug in the clear operation: let it clear with the right video
+      erase character so that ncurses apps would appear properly.
+    * Fixed virtual console switching (alt-f1, alt-f2, etc.) so it will
+      save/redraw the screen like it should.
+    * FLTK: The cursor is visible again.
+    * If keyboard focus is taken away from the consoles, it will release
+      any pressed key in the VM.
+
+* Version 0.6.0 AKA "Getting even"
+  * Ballard, Jonathan H.:  
+    * fixed implicit declarations
+    * added co_os_realloc()
+    * fixed overflow with the XML memory config
+    * reimplemented os/winnt/user/daemon.c.
+      A threaded implementation with with message queue,
+      wait state, and error recovery.
+    * merged the NT-native console.
+    * console updates and improvements (cocon, console-nt)
+    * update FLTK/console clearscreen (20040305)
+    * enabled console-nt exit (20040305)
+  * Added more checks to the XML parsing.
+  * Made the context switch code more sensitive about the processor's
+    capabilities, running coLinux on old AMD processors will hopefully not
+    cause a reboot anymore.
+  * Linux patch upgraded to 2.4.25.
+  * Hopefully fixed the %fs/%gs issue for good.
+  * vmlinux can now be bigger while not causing the host to boot, this means
+    that you can compile more stuff not as modules.
+  * Reimplemented the method in which coLinux allocates memory in the host
+    kernel. It now allocates memory from the unmapped free page pool, which
+    means you can use more than 256MB of RAM, unlike the previous method.
+    Note that the first coLinux boot may be a little slower since Windows is
+    freeing cache and swapping out stuff in order to provide accommodation for
+    Linux's memory. You can see it in action by looking at the Task Manager.
+  * NSIS-based installer for the Windows binary distribution (based on
+    work by NEBOR Regis.
+  * gettimeofday() now works. Things that broke because they depended on it
+    should now work. I have to enable port I/O in order to for this to work,
+    but I plan to disable it in the future. If you compile a new vmlinux
+    Make sure that CONFIG_X86_TSC is enabled in your .config file.
+  * New daemon switch -t: Type of console to launch. Default is fltk.
+  * Added an NSIS installer script.
+
+* Version 0.5.4 AKA "Focal Segmental Glomerulosclerosis" (%gs/%fs) release
+  * Fixed an issue with i686-optimized pthread and the preservation of
+    %gs and %fs. The crashes that were caused by the i686 Gentoo image
+    should now disappear.
+    WINE would also work now ;)
+  * cobd: Fixed accessing large block devices (1GB >). cobd0 was passing
+    wrong information to userspace.
+  * conet: Statistics are now gathered (patch by Pat Erley)
+  * Tuned the time conversion between Windows and Linux. The machine is 
+    now initialized with the right date, not 4 days backwards.
+  * Applied a configuration parsing fix (patch by Ballard Jonathan)
+  * Some improvements of the switch code. We now preserve more registers,
+    (MMX/SSE/SSE2/FP), and coLinux now has its own GDT. These changes 
+    should assure stability on more systems and processors.
+    This fix also appears to solve the problem where processes were stuck
+    on nanosleep() calls.
+  * conet-pcap: pcap-based daemon (contributed by Alejandro R. Sedeno).
+  * Network configuration is now handled in the coLinux configuration XML.
+    For backward compatibility, add:
+    <network index="0" name="TAP" type="tap"></network>
+
+    If you want to use pcap (i.e, bridged Ethernet), add:
+    <network index="0" name="XXXX" type="bridged"></network>
+    (Where XXXX is a substring of your network adapter's name)
+
+    Optional attributes: mac="XX:XX:XX:XX:XX:XX" - specifies the MAC
+    address of the interface in the Linux side. Recommended on bridged
+    networking setups, where more than one Windows machine will be
+    running coLinux on the same subnet.
+
+    I also prepared the ground for supporting more than one network device
+    (i.e, eth1, eth2, etc.), but it is not yet completed.
+  * linux: avoid more I/O in time.c.
+
+* Version 0.5.3 AKA "Valentine release"
+  * Virtual CMOS system time is now passed to Linux, you no longer
+    need to update the time using ntp on boot. Note that the virtual CMOS
+    time is GMT, so the coLinux machine needs to set its own timezone.
+  * cobd's devfs support was added to the Linux patch. Gentoo would work
+    now (based on a patch from Pat Erley).
+    A Gentoo root filesystem was created and released by Pat Erley.
+  * Fixed an unwanted termination that was discovered when devfs was compiled
+    in to the kernel.
+  * Fixed an issue with mxml and the passage of boot parameters.
+  * colinux-console: Fixed the CPU utilization issue.
+  * colinux-console: Escape doesn't close the window now.
+  * coLinux RAM is configurable, using a memory element in the XML under
+    <colinux>, like: <memory size="64"></memory>. Minimum is 8MB, maximum
+    is 192MB.
+    WARNING: high values might destabilize Windows, because the memory is
+    allocated from the non-cached pool which has a maximum of 256MB
+    system-wide, meaning there's less left for Windows drivers and
+    subsystems.
+  * bin/cobuild.sh: Thomas Fritzsche contributed this script which
+    automates the creation of a cross compilation cygwin environment
+    on Linux.
+
+* Version 0.5.3-pre2
+  * Fixed the reported (and unreported) network bugs.
+  * Worked out some scheduling issue.
+
+* Version 0.5.3-pre1 AKA "flamed chicken"
+  * Fixed a BSOD bug (thanks Richard Goodwin for the memory dump stacks)
+  * No longer depending on the Microsoft DDK for the build (review doc/building),
+    (thanks Nir Perry for the encourgement)
+  * The daemon launches the console by default when it is launched (can be turned
+    off with '-d', see '-h').
+  * The daemon is killable just like a normal Windows process. Doing so stops the
+    Linux machines cleanly (from Windows' standpoint), so feel free to close the
+    window, end the task, CTRL-C, etc.
+  * It no longer depends on the Microsoft DDK for the build.
+  * An almost complete rewrite - we now use message passing instead of hardwired
+    ioctls(). Only the daemon communicates with the driver. The console and the
+    network daemon communicate with the daemon using a named pipe.
+  * Fixed the block device bug that fsck triggered (thanks Daniel Glockner)
+  * Hopefully addressed the network corruption issue (thanks Daniel Glockner again)
+  * Boot parameters are now passed to the kernel. Make sure you update your
+    XMLs with 'root=/dev/cobd0' if you still want to boot from the first
+    block device.
+  * The conet daemon is a separate process (shouldn't affect you).
+
+* Version 0.5.2
+  * Added some missing files to the build tree
+  * doc/cygwin-cross-build - How to build a cygwin cross compilation tools
+    on Linux.
+  * Made the daemon more proofed to mistakes. It's logic about loading/
+    unloading the driver is much more sane now.
+  * Added a cursor support to the console.

@@ -1,0 +1,31 @@
+Serial support
+
+Index: linux-2.6.26-source/drivers/serial/Kconfig
+===================================================================
+--- linux-2.6.26-source.orig/drivers/serial/Kconfig
++++ linux-2.6.26-source/drivers/serial/Kconfig
+@@ -1403,3 +1403,15 @@
+ 	default 9600 if (SERIAL_SPORT_BAUD_RATE_9600)
+ 
+ endmenu
++
++config SERIAL_COOPERATIVE
++	bool "coLinux serial device support"
++	depends on COOPERATIVE
++	default y
++	help
++	  say Y, if you have colinux
++
++config SERIAL_COOPERATIVE_CONSOLE
++	bool "coLinux serial console support"
++	depends on SERIAL_COOPERATIVE=y
++	select SERIAL_CORE_CONSOLE
+Index: linux-2.6.26-source/drivers/serial/Makefile
+===================================================================
+--- linux-2.6.26-source.orig/drivers/serial/Makefile
++++ linux-2.6.26-source/drivers/serial/Makefile
+@@ -68,3 +68,4 @@
+ obj-$(CONFIG_SERIAL_KS8695) += serial_ks8695.o
+ obj-$(CONFIG_KGDB_SERIAL_CONSOLE) += kgdboc.o
+ obj-$(CONFIG_SERIAL_QE) += ucc_uart.o
++obj-$(CONFIG_SERIAL_COOPERATIVE) += coserial.o
