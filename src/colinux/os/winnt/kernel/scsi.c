@@ -11,7 +11,7 @@
 
 #include "ddk.h"
 #include <ddk/ntifs.h>
-#include <ddk/ntdddisk.h>
+#include <ntdddisk.h>
 #ifdef WIN64
 #include <ntddscsi.h>
 #else
@@ -20,7 +20,6 @@
 
 #ifdef WIN64
 // FIXME: W64: Collision with Linux kernel headers
-#define uintptr_t dummy_uintptr_t
 #define _SIZE_T
 #define _SSIZE_T
 #define _PTRDIFF_T
@@ -130,7 +129,7 @@ again:
 
 		eof.EndOfFile.QuadPart = (unsigned long long)dp->conf->size * 1048576LL;
 #if COSCSI_DEBUG_OPEN
-		co_debug("eof.EndOfFile.QuadPart: %lld", eof.EndOfFile.QuadPart);
+		co_debug("eof.EndOfFile.QuadPart: %I64d", eof.EndOfFile.QuadPart);
 #endif
 		status = ZwSetInformationFile(dp->os_handle, &IoStatusBlock, &eof, sizeof(eof), FileEndOfFileInformation);
 #if COSCSI_DEBUG_OPEN
@@ -201,7 +200,7 @@ typedef struct {
 
 static co_rc_t scsi_transfer_file_block(co_monitor_t *cmon,
 				  void *host_data, void *linuxvm,
-				  unsigned long size,
+				  uintptr_t size,
 				  co_monitor_transfer_dir_t dir)
 {
 	IO_STATUS_BLOCK isb;
@@ -219,8 +218,8 @@ static co_rc_t scsi_transfer_file_block(co_monitor_t *cmon,
 				NULL);
 
 	if (status != STATUS_SUCCESS) {
-		co_debug_error("scsi io failed: %p %lx (reason: %x)",
-				linuxvm, size, (int)status);
+		co_debug_error("scsi io failed: %p %I64x (reason: %x)",
+				linuxvm, (int64_t)size, (int)status);
 		return co_status_convert(status);
 	}
 

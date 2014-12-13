@@ -26,7 +26,7 @@
 struct co_elf_data {
 	/* ELF binary buffer */
 	unsigned char *buffer;
-	unsigned long size;
+	uintptr_t size;
 
 	/* Elf header and seconds */
 	Elf32_Ehdr *header;
@@ -58,29 +58,29 @@ struct co_elf_symbol {
  * loaded vmlinux memory according the section headers, initialize
  * the bss, get rid of unused sections, etc.).
  */
-Elf32_Phdr *co_get_program_header(co_elf_data_t *pl, long index)
+Elf32_Phdr *co_get_program_header(co_elf_data_t *pl, int index)
 {
 	return (Elf32_Phdr *)(pl->buffer + pl->header->e_phoff +
 			      (pl->header->e_phentsize * index));
 }
 
-unsigned long co_get_program_count(co_elf_data_t *pl)
+uintptr_t co_get_program_count(co_elf_data_t *pl)
 {
 	return pl->header->e_phnum;
 }
 
-Elf32_Shdr *co_get_section_header(co_elf_data_t *pl, long index)
+Elf32_Shdr *co_get_section_header(co_elf_data_t *pl, int index)
 {
 	return (Elf32_Shdr *)(pl->buffer + pl->header->e_shoff +
 			      (pl->header->e_shentsize * (index)));
 }
 
-unsigned long co_get_section_count(co_elf_data_t *pl)
+uintptr_t co_get_section_count(co_elf_data_t *pl)
 {
 	return pl->header->e_shnum;
 }
 
-static void *co_get_at_offset(co_elf_data_t *pl, Elf32_Shdr *section, unsigned long index)
+static void *co_get_at_offset(co_elf_data_t *pl, Elf32_Shdr *section, uintptr_t index)
 {
 	return &pl->buffer[section->sh_offset + index];
 }
@@ -92,7 +92,7 @@ char *co_get_section_name(co_elf_data_t *pl, Elf32_Shdr *section)
 
 Elf32_Shdr *co_get_section_by_name(co_elf_data_t *pl, const char *name)
 {
-	unsigned long index;
+	uintptr_t index;
 	Elf32_Shdr *section;
 
 	for (index=1; index < co_get_section_count(pl); index++) {
@@ -104,22 +104,22 @@ Elf32_Shdr *co_get_section_by_name(co_elf_data_t *pl, const char *name)
 	return NULL;
 }
 
-Elf32_Sym *co_get_symbol(co_elf_data_t *pl, unsigned long index)
+Elf32_Sym *co_get_symbol(co_elf_data_t *pl, uintptr_t index)
 {
 	return (Elf32_Sym *)
 		co_get_at_offset(pl,
 				    pl->symbol_table_section, index*sizeof(Elf32_Sym));
 }
 
-char *co_get_string(co_elf_data_t *pl, unsigned long index)
+char *co_get_string(co_elf_data_t *pl, uintptr_t index)
 {
 	return co_get_at_offset(pl, pl->string_table_section, index);
 }
 
 co_elf_symbol_t *co_get_symbol_by_name(co_elf_data_t *pl, const char *name)
 {
-	long index =0 ;
-	unsigned long symbols;
+	int index =0 ;
+	uintptr_t symbols;
 
 	symbols = pl->symbol_table_section->sh_size / sizeof(Elf32_Sym);
 
@@ -133,7 +133,7 @@ co_elf_symbol_t *co_get_symbol_by_name(co_elf_data_t *pl, const char *name)
 	return NULL;
 }
 
-unsigned long co_get_symbol_offset(co_elf_data_t *pl, Elf32_Sym *symbol)
+uintptr_t co_get_symbol_offset(co_elf_data_t *pl, Elf32_Sym *symbol)
 {
 	/* It doesn't work with absolute symbols, need to fix that? */
 
@@ -153,12 +153,12 @@ void *co_elf_get_symbol_data(co_elf_data_t *pl, co_elf_symbol_t *symbol)
 	return pl->buffer + symbol->sym.st_value - section->sh_addr + section->sh_offset;
 }
 
-unsigned long co_elf_get_symbol_value(co_elf_symbol_t *symbol)
+uintptr_t co_elf_get_symbol_value(co_elf_symbol_t *symbol)
 {
  	return symbol->sym.st_value;
 }
 
-co_rc_t co_elf_image_read(co_elf_data_t **pl_out, void *elf_buf, unsigned long size)
+co_rc_t co_elf_image_read(co_elf_data_t **pl_out, void *elf_buf, uintptr_t size)
 {
 	co_elf_data_t *pl;
 
@@ -192,7 +192,7 @@ co_rc_t co_elf_image_read(co_elf_data_t **pl_out, void *elf_buf, unsigned long s
 	return CO_RC(OK);
 }
 
-co_rc_t co_section_load(co_daemon_t *daemon, unsigned long index)
+co_rc_t co_section_load(co_daemon_t *daemon, uintptr_t index)
 {
 	Elf32_Shdr *section;
 	co_monitor_ioctl_load_section_t params;
@@ -225,8 +225,8 @@ co_rc_t co_section_load(co_daemon_t *daemon, unsigned long index)
  */
 co_rc_t co_elf_image_load(co_daemon_t *daemon)
 {
-	unsigned long index;
-	unsigned long sections;
+	uintptr_t index;
+	uintptr_t sections;
 	co_rc_t rc;
 
 	sections = co_get_section_count(daemon->elf_data);

@@ -60,7 +60,7 @@ static co_rc_t create_section(co_debug_section_t **section_out)
 
 static void resize_section(co_manager_debug_t *debug, co_debug_section_t *section)
 {
-	long new_size = 0, old_size = 0;
+	intptr_t new_size = 0, old_size = 0;
 	char *new_buffer, *old_buffer;
 
 	if (section->filled >= section->buffer_size / 2) {
@@ -118,9 +118,9 @@ static void memcpy_vector(char *dest, co_debug_write_vector_t *vec, int vec_size
 	}
 }
 
-static inline long co_debug_write_vector_size(co_debug_write_vector_t *vec, int vec_size)
+static inline intptr_t co_debug_write_vector_size(co_debug_write_vector_t *vec, int vec_size)
 {
-	long size = 0;
+	intptr_t size = 0;
 	while (vec_size--) {
 		size += vec->size;
 		vec++;
@@ -132,7 +132,7 @@ static co_rc_t append_to_buffer(co_manager_debug_t *debug, co_debug_section_t *s
 				co_debug_write_vector_t *vec, int vec_size)
 {
 	co_rc_t rc = CO_RC(OK);
-	long vec_length = 0;
+	intptr_t vec_length = 0;
 
 	resize_section(debug, section);
 
@@ -244,7 +244,7 @@ co_rc_t co_debug_write_log(co_manager_debug_t *debug,
 			   struct co_debug_section **section_ptr,
 			   co_debug_write_vector_t *vec, int vec_size)
 {
-	unsigned long size;
+	uintptr_t size;
 	co_debug_tlv_t tlv;
 	co_debug_write_vector_t local_vec[3];
 
@@ -273,12 +273,12 @@ co_rc_t co_debug_write_log(co_manager_debug_t *debug,
 }
 
 co_rc_t co_debug_read(co_manager_debug_t *debug,
-		      char *buf, unsigned long size,
-		      unsigned long *read_size)
+		      char *buf, uintptr_t size,
+		      uintptr_t *read_size)
 {
 	co_rc_t rc;
 	co_debug_section_t *section, *section_new;
-	long user_filled = 0;
+	intptr_t user_filled = 0;
 
 	co_os_wait_sleep(debug->read_wait);
 	co_os_mutex_acquire(debug->mutex);
@@ -395,7 +395,7 @@ co_rc_t co_debug_free(co_manager_debug_t *debug)
 	return CO_RC(OK);
 }
 
-void co_debug_buf(const char *buf, long size)
+void co_debug_buf(const char *buf, int size)
 {
 	co_debug_write_vector_t vec;
 

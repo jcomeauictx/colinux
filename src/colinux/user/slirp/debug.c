@@ -370,8 +370,8 @@ slirp_exit(exit_status)
 	if (slirp_forked) {
 		/* Menendez time */
 		if (kill(getppid(), SIGQUIT) < 0)
-			lprint("Couldn't kill parent process %ld!\n",
-			    (long) getppid());
+			lprint("Couldn't kill parent process %d!\n",
+			    (int) getppid());
     	}
 
 	/* Restore the terminal if we gotta */

@@ -13,7 +13,8 @@
 #ifndef __COLINUX_ARCH_I386_MMU_H__
 #define __COLINUX_ARCH_I386_MMU_H__
 
-typedef unsigned long co_pfn_t;
+#include <stdint.h>
+typedef uintptr_t co_pfn_t;
 
 #define PMD_MASK        (~(PMD_SIZE-1))
 #define _KERNPG_TABLE   (_PAGE_PRESENT | _PAGE_RW | _PAGE_ACCESSED | _PAGE_DIRTY)

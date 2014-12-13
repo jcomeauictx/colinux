@@ -61,7 +61,7 @@ co_rc_t co_queue_flush(co_queue_t *queue)
 	co_rc_t rc = CO_RC(OK);
 
 	while (1) {
-		void *ptr;
+		void *ptr=NULL;
 
 		rc = co_queue_pop_tail(queue, &ptr);
 		if (!CO_OK(rc))

@@ -29,8 +29,8 @@ struct utf8_table {
 	int     cmask;
 	int     cval;
 	int     shift;
-	long    lmask;
-	long    lval;
+	int    lmask;
+	int    lval;
 };
 
 static struct utf8_table utf8_table[] =
@@ -46,7 +46,7 @@ static struct utf8_table utf8_table[] =
 
 static int utf8_mbtowc(co_wchar_t *p, const unsigned char *s, int n)
 {
-	long l;
+	int l;
 	int c0, c, nc;
 	struct utf8_table *t;
 
@@ -75,7 +75,7 @@ static int utf8_mbtowc(co_wchar_t *p, const unsigned char *s, int n)
 
 static int utf8_wctomb(unsigned char *s, co_wchar_t wc, int maxlen)
 {
-	long l;
+	int l;
 	int c, nc;
 	struct utf8_table *t;
 
@@ -243,7 +243,7 @@ int co_utf8_wctowbstrlen(const co_wchar_t *src, int maxlen)
 	return length;
 }
 
-co_rc_t co_utf8_dup_to_wc(const char *src, co_wchar_t **wstring, unsigned long *size_out)
+co_rc_t co_utf8_dup_to_wc(const char *src, co_wchar_t **wstring, uintptr_t *size_out)
 {
 	int size;
 	co_wchar_t *buffer;

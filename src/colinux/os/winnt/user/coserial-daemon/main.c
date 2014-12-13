@@ -30,8 +30,8 @@ COLINUX_DEFINE_MODULE("colinux-serial-daemon");
 
 typedef struct start_parameters {
 	bool_t show_help;
-	unsigned int index;
-	unsigned int instance;
+	uintptr_t index;
+	uintptr_t instance;
 	bool_t filename_specified;
 	char filename [CO_SERIAL_DESC_STR_SIZE];
 	bool_t mode_specified;
@@ -47,10 +47,10 @@ static co_user_monitor_t *g_monitor_handle;
 static co_winnt_reactor_packet_user_t g_reactor_handle;
 
 
-static co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, unsigned long size)
+static co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, uintptr_t size)
 {
 	co_message_t *message;
-	unsigned long message_size;
+	uintptr_t message_size;
 	long size_left = size;
 	long position = 0;
 
@@ -67,7 +67,7 @@ static co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, un
 	return CO_RC(OK);
 }
 
-static co_rc_t std_receive(co_reactor_user_t user, unsigned char *buffer, unsigned long size)
+static co_rc_t std_receive(co_reactor_user_t user, unsigned char *buffer, uintptr_t size)
 {
 	struct {
 		co_message_t message;
@@ -171,7 +171,7 @@ handle_parameters(start_parameters_t *start_parameters, int argc, char *argv[])
 	}
 
 	if (start_parameters->index < 0 || start_parameters->index >= CO_MODULE_MAX_SERIAL) {
-		co_terminal_print("colinux-serial-daemon: Invalid index: %d\n", start_parameters->index);
+		co_terminal_print("colinux-serial-daemon: Invalid index: %d\n", (int)start_parameters->index);
 		return CO_RC(INVALID_PARAMETER);
 	}
 

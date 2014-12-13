@@ -16,7 +16,7 @@
 #include <colinux/os/alloc.h>
 #include <colinux/os/kernel/user.h>
 
-co_rc_t co_copy_to_user(char *user_address, char *kernel_address, unsigned long size)
+co_rc_t co_copy_to_user(char *user_address, char *kernel_address, uintptr_t size)
 {
 	PMDL user_mdl;
 
@@ -41,7 +41,7 @@ co_rc_t co_copy_to_user(char *user_address, char *kernel_address, unsigned long 
 }
 
 
-co_rc_t co_copy_from_user(char *user_address, char *kernel_address, unsigned long size)
+co_rc_t co_copy_from_user(char *user_address, char *kernel_address, uintptr_t size)
 {
 	PMDL user_mdl;
 

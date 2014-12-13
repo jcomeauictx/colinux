@@ -51,7 +51,7 @@
 extern char _name_;                                     \
 extern char _name_##_end;                               \
 							\
-static inline unsigned long _name_##_size(void)		\
+static inline uintptr_t _name_##_size(void)		\
 {							\
 	return &_name_##_end - &_name_;			\
 }							\
@@ -545,9 +545,9 @@ static inline void co_passage_page_dump_state(co_arch_state_stack_t *state)
 	co_debug("dr0: %08lx   dr1: %08lx  dr2: %08lx  dr3: %08lx  dr6: %08lx  dr7: %08lx",
 		 state->dr0, state->dr1, state->dr2, state->dr3, state->dr6, state->dr7);
 
-	co_debug("gdt: %08lx:%04x   idt:%08lx:%04x   ldt:%04x  tr:%04x",
-		 (long)state->gdt.base, state->gdt.limit,
-		 (long)state->idt.table, state->idt.size,
+	co_debug("gdt: %08x:%04x   idt:%08x:%04x   ldt:%04x  tr:%04x",
+		 (int)state->gdt.base, state->gdt.limit,
+		 (int)state->idt.table, state->idt.size,
 		 state->ldt, state->tr);
 
 	co_debug("return_eip: %08lx   flags: %08lx   esp: %08lx",
@@ -567,14 +567,14 @@ static inline void co_passage_page_dump(co_arch_passage_page_t *page)
 }
 
 static void short_temp_address_space_init(co_arch_passage_page_normal_address_space_t *pp,
-					  unsigned long pa, unsigned long *va)
+					  uintptr_t pa, uintptr_t *va)
 {
 	int i;
 
 	struct {
-		unsigned long pmd;
-		unsigned long pte;
-		unsigned long paddr;
+		uintptr_t pmd;
+		uintptr_t pte;
+		uintptr_t paddr;
 	} maps[2];
 
 	for (i=0; i < 2; i++) {
@@ -617,17 +617,17 @@ static void short_temp_address_space_init(co_arch_passage_page_normal_address_sp
  * to the physical address of the passage page.
  */
 static void normal_temp_address_space_init(co_arch_passage_page_normal_address_space_t *as,
-					   unsigned long pa, unsigned long va)
+					   uintptr_t pa, uintptr_t va)
 {
 	int i;
-	unsigned long vas[2] = {
-		(unsigned long)(va),
-		(unsigned long)(pa),
+	uintptr_t vas[2] = {
+		(uintptr_t)(va),
+		(uintptr_t)(pa),
 	};
 
 	for (i=0; i < 2; i++) {
-		unsigned long pmd = vas[i] >> CO_ARCH_PMD_SHIFT;
-		unsigned long pte = (vas[i] & ~CO_ARCH_PMD_MASK) >> CO_ARCH_PAGE_SHIFT;
+		uintptr_t pmd = vas[i] >> CO_ARCH_PMD_SHIFT;
+		uintptr_t pte = (vas[i] & ~CO_ARCH_PMD_MASK) >> CO_ARCH_PAGE_SHIFT;
 		int j = i;
 
 		if (!as->pgd[pmd]) {
@@ -641,18 +641,18 @@ static void normal_temp_address_space_init(co_arch_passage_page_normal_address_s
 }
 
 static void pae_temp_address_space_init(co_arch_passage_page_pae_address_space_t *as,
-					unsigned long pa, unsigned long va)
+					uintptr_t pa, uintptr_t va)
 {
 	int i;
-	unsigned long vas[2] = {
-		(unsigned long)(va),
-		(unsigned long)(pa),
+	uintptr_t vas[2] = {
+		(uintptr_t)(va),
+		(uintptr_t)(pa),
 	};
 
 	for (i=0; i < 2; i++) {
-		unsigned long pgd = vas[i] >> CO_ARCH_PAE_PGD_SHIFT;
-		unsigned long pmd = (vas[i] & ~CO_ARCH_PAE_PGD_MASK) >> CO_ARCH_PAE_PMD_SHIFT;
-		unsigned long pte = (vas[i] & ~CO_ARCH_PAE_PMD_MASK) >> CO_ARCH_PAGE_SHIFT;
+		uintptr_t pgd = vas[i] >> CO_ARCH_PAE_PGD_SHIFT;
+		uintptr_t pmd = (vas[i] & ~CO_ARCH_PAE_PGD_MASK) >> CO_ARCH_PAE_PMD_SHIFT;
+		uintptr_t pte = (vas[i] & ~CO_ARCH_PAE_PMD_MASK) >> CO_ARCH_PAGE_SHIFT;
 		int j = i, k = i;
 
 		if (!as->main[pgd]) {
@@ -675,7 +675,7 @@ static void pae_temp_address_space_init(co_arch_passage_page_pae_address_space_t
 co_rc_t co_monitor_arch_passage_page_init(co_monitor_t *cmon)
 {
 	co_arch_passage_page_t *pp = cmon->passage_page;
-	unsigned long caps;
+	uintptr_t caps;
 
 	if (co_monitor_passage_func_short_sysenter_size() > sizeof (pp->code))
 		return CO_RC(ERROR);
@@ -709,9 +709,9 @@ co_rc_t co_monitor_arch_passage_page_init(co_monitor_t *cmon)
 	 * Init temporary address space page tables for host side:
 	 */
 	if (!co_is_pae_enabled()) {
-		unsigned long va[2] = {
-			(unsigned long)(cmon->passage_page_vaddr),
-			(unsigned long)(pp),
+		uintptr_t va[2] = {
+			(uintptr_t)(cmon->passage_page_vaddr),
+			(uintptr_t)(pp),
 		};
 
 		pp->temp_pgd_physical = co_os_virt_to_phys(&pp->temp_space.pgd);
@@ -722,18 +722,18 @@ co_rc_t co_monitor_arch_passage_page_init(co_monitor_t *cmon)
 
 	} else {
 		pae_temp_address_space_init(&pp->host_pae, pp->self_physical_address,
-					    (unsigned long)(&pp->first_page));
+					    (uintptr_t)(&pp->first_page));
 		pp->host_state.temp_cr3 = co_os_virt_to_phys(&pp->host_pae);
-		pp->host_state.va = (unsigned long)(&pp->first_page);
+		pp->host_state.va = (uintptr_t)(&pp->first_page);
 
 		/*
 		 * Init the Linux context.
 		 */
 		pp->linuxvm_state.temp_cr3 = co_os_virt_to_phys(&pp->guest_normal);
 		normal_temp_address_space_init(&pp->guest_normal, pp->self_physical_address,
-					       (unsigned long)(cmon->passage_page_vaddr));
+					       (uintptr_t)(cmon->passage_page_vaddr));
 
-		pp->linuxvm_state.va = (unsigned long)(cmon->passage_page_vaddr);
+		pp->linuxvm_state.va = (uintptr_t)(cmon->passage_page_vaddr);
 	}
 
 	pp->linuxvm_state.dr0 = co_get_dr0();

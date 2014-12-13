@@ -57,9 +57,9 @@ struct co_osdep_manager {
 	co_list_t mdl_list;
 	co_list_t mapped_allocated_list;
 
-	unsigned long mdls_allocated;
-	unsigned long pages_allocated;
-	unsigned long pages_mapped;
+	uintptr_t mdls_allocated;
+	uintptr_t pages_allocated;
+	uintptr_t pages_mapped;
 	unsigned long long hostmem_max_physical_address;
 };
 

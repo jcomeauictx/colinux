@@ -71,7 +71,7 @@ static co_rc_t packet_read_complete(co_linux_reactor_packet_user_t handle)
 }
 
 static co_rc_t packet_send_whole(co_linux_reactor_packet_user_t handle,
-				 unsigned char *buffer, unsigned long size)
+				 unsigned char *buffer, uintptr_t size)
 {
 	int written;
 
@@ -86,7 +86,7 @@ static co_rc_t packet_read(co_reactor_user_t user)
 	return packet_read_complete((co_linux_reactor_packet_user_t)user);
 }
 
-static co_rc_t packet_send(co_reactor_user_t user, unsigned char *buffer, unsigned long size)
+static co_rc_t packet_send(co_reactor_user_t user, unsigned char *buffer, uintptr_t size)
 {
 	return packet_send_whole((co_linux_reactor_packet_user_t)user, buffer, size);
 }

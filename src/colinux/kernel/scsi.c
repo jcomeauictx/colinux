@@ -70,7 +70,7 @@ void co_scsi_request(co_monitor_t *cmon, int op, int unit) {
 	case CO_SCSI_OPEN: /* 1 */
 		{
 			co_passage_page->params[0] = scsi_file_open(cmon, dp);
-			co_passage_page->params[1] = (unsigned long) dp->os_handle;
+			co_passage_page->params[1] = (uintptr_t) dp->os_handle;
 		}
 		break;
 	case CO_SCSI_CLOSE: /* 2 */

@@ -58,7 +58,7 @@ protected:
 	co_user_monitor_t *message_monitor;
 	bool_t attached;
 
-	static co_rc_t message_receive(co_reactor_user_t user, unsigned char *buffer, unsigned long size);
+	static co_rc_t message_receive(co_reactor_user_t user, unsigned char *buffer, uintptr_t size);
 };
 
 #endif

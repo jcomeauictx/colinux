@@ -37,7 +37,7 @@
 #include "pci.h"
 #include "video.h"
 
-co_rc_t co_monitor_malloc(co_monitor_t* cmon, unsigned long bytes, void** ptr)
+co_rc_t co_monitor_malloc(co_monitor_t* cmon, uintptr_t bytes, void** ptr)
 {
 	void* block = co_os_malloc(bytes);
 
@@ -67,10 +67,10 @@ static co_rc_t guest_address_space_init(co_monitor_t *cmon)
 	co_pfn_t 	self_map_pfn;
 	co_pfn_t 	passage_page_pfn;
 	co_pfn_t 	swapper_pg_dir_pfn;
-	unsigned long 	pp_pagetables_pgd;
-	unsigned long	self_map_page_offset;
-	unsigned long 	passage_page_offset;
-	unsigned long	reversed_physical_mapping_offset;
+	uintptr_t 	pp_pagetables_pgd;
+	uintptr_t	self_map_page_offset;
+	uintptr_t 	passage_page_offset;
+	uintptr_t	reversed_physical_mapping_offset;
 
 	rc = co_monitor_get_pfn(cmon, cmon->import.kernel_swapper_pg_dir, &swapper_pg_dir_pfn);
 	if (!CO_OK(rc)) {
@@ -176,21 +176,21 @@ static co_rc_t guest_address_space_init(co_monitor_t *cmon)
 	}
 
 	{
-		long 		io_buffer_page;
-		long 		io_buffer_num_pages = CO_VPTR_IO_AREA_SIZE >> CO_ARCH_PAGE_SHIFT;
-		long 		io_buffer_offset;
-		unsigned long 	io_buffer_host_address = (unsigned long)(cmon->io_buffer);
+		intptr_t 		io_buffer_page;
+		intptr_t 		io_buffer_num_pages = CO_VPTR_IO_AREA_SIZE >> CO_ARCH_PAGE_SHIFT;
+		intptr_t 		io_buffer_offset;
+		uintptr_t 	io_buffer_host_address = (uintptr_t)(cmon->io_buffer);
 
 		io_buffer_offset = ((CO_VPTR_IO_AREA_START & ((1 << PGDIR_SHIFT) - 1)) >>
 				    CO_ARCH_PAGE_SHIFT) * sizeof(linux_pte_t);
 
 		for (io_buffer_page=0; io_buffer_page < io_buffer_num_pages; io_buffer_page++) {
-			unsigned long io_buffer_pfn = co_os_virt_to_phys((void*)io_buffer_host_address) >> CO_ARCH_PAGE_SHIFT;
+			uintptr_t io_buffer_pfn = co_os_virt_to_phys((void*)io_buffer_host_address) >> CO_ARCH_PAGE_SHIFT;
 
 			rc = co_monitor_create_ptes(cmon, CO_VPTR_SELF_MAP + io_buffer_offset,
 						    sizeof(linux_pte_t), &io_buffer_pfn);
 			if (!CO_OK(rc)) {
-				co_debug_error("error %08x initializing io buffer (%ld)", (int)rc, io_buffer_page);
+				co_debug_error("error %08x initializing io buffer (%I64d)", (int)rc, (int64_t)io_buffer_page);
 				goto out_error;
 			}
 
@@ -205,13 +205,13 @@ out_error:
 	return rc;
 }
 
-static bool_t device_request(co_monitor_t *cmon, co_device_t device, unsigned long *params)
+static bool_t device_request(co_monitor_t *cmon, co_device_t device, uintptr_t *params)
 {
 	co_debug_lvl(context_switch, 14, "device: %d", device);
 	switch (device) {
 	case CO_DEVICE_BLOCK: {
 		co_block_request_t *request;
-		unsigned int unit = params[0];
+		unsigned int unit = (unsigned int)params[0];
 
 		co_debug_lvl(blockdev, 13, "blockdev requested (unit %d)", unit);
 
@@ -306,7 +306,7 @@ static co_rc_t callback_return_messages(co_monitor_t *cmon)
 	{
 		co_message_queue_item_t *message_item;
 		co_message_t *message;
-		unsigned long size;
+		uintptr_t size;
 		co_linux_message_t *linux_message;
 
 		rc = co_queue_peek_tail(queue, (void **)&message_item);
@@ -324,14 +324,14 @@ static co_rc_t callback_return_messages(co_monitor_t *cmon)
 		if (!CO_OK(rc))
 			return rc;
 
-		if ((unsigned long)message->from >= (unsigned long)CO_MODULES_MAX) {
+		if ((uintptr_t)message->from >= (uintptr_t)CO_MODULES_MAX) {
 			co_debug_system("BUG! %s:%d", __FILE__, __LINE__);
 			co_queue_free(queue, message_item);
 			co_os_free(message);
 			break;
 		}
 
-		if ((unsigned long)message->to >= (unsigned long)CO_MODULES_MAX){
+		if ((uintptr_t)message->to >= (uintptr_t)CO_MODULES_MAX){
 			co_debug_system("BUG! %s:%d", __FILE__, __LINE__);
 			co_queue_free(queue, message_item);
 			co_os_free(message);
@@ -339,7 +339,7 @@ static co_rc_t callback_return_messages(co_monitor_t *cmon)
 		}
 
 		linux_message = (co_linux_message_t *)message->data;
-		if ((unsigned long)linux_message->device >= (unsigned long)CO_DEVICES_TOTAL){
+		if ((uintptr_t)linux_message->device >= (uintptr_t)CO_DEVICES_TOTAL){
 			co_debug_system("BUG! %s:%d %d %d", __FILE__, __LINE__,
 					message->to, message->from);
 			co_queue_free(queue, message_item);
@@ -358,7 +358,7 @@ static co_rc_t callback_return_messages(co_monitor_t *cmon)
 
 	co_passage_page->params[0] = io_buffer - (unsigned char *)&cmon->io_buffer->buffer;
 
-	co_debug_lvl(messages, 12, "sending messages to linux (%ld bytes)", co_passage_page->params[0]);
+	co_debug_lvl(messages, 12, "sending messages to linux (%I64d bytes)", (int64_t)co_passage_page->params[0]);
 
 	return CO_RC(OK);
 }
@@ -367,7 +367,7 @@ static void callback_return_jiffies(co_monitor_t *cmon)
 {
 	co_timestamp_t timestamp;
 	long long timestamp_diff;
-	unsigned long jiffies = 0;
+	uintptr_t jiffies = 0;
 
 	co_os_get_timestamp(&timestamp);
 
@@ -420,8 +420,8 @@ static bool_t co_terminate(co_monitor_t *cmon)
 				    "...%s", str + len - sizeof(cmon->bug_info.text) + 4);
 		}
 
-		co_debug_system("BUG%ld at %s:%ld", cmon->bug_info.code,
-				cmon->bug_info.text, cmon->bug_info.line);
+		co_debug_system("BUG%I64d at %s:%I64d", (int64_t)cmon->bug_info.code,
+				cmon->bug_info.text, (int64_t)cmon->bug_info.line);
 	}
 
 	cmon->state = CO_MONITOR_STATE_TERMINATED;
@@ -444,7 +444,7 @@ static bool_t co_idle(co_monitor_t *cmon)
 
 static void co_free_pages(co_monitor_t *cmon, vm_ptr_t address, int num_pages)
 {
-	unsigned long scan_address;
+	uintptr_t scan_address;
 	int j;
 
 	scan_address = address;
@@ -456,7 +456,7 @@ static void co_free_pages(co_monitor_t *cmon, vm_ptr_t address, int num_pages)
 
 static co_rc_t co_alloc_pages(co_monitor_t *cmon, vm_ptr_t address, int num_pages)
 {
-	unsigned long scan_address;
+	uintptr_t scan_address;
 	co_rc_t rc = CO_RC(OK);
 	int i;
 
@@ -483,9 +483,9 @@ static void co_monitor_getpp(co_monitor_t* cmon,
 	vm_ptr_t	vaddr;
 	co_pfn_t	pfn;
 	char*		page;
-	unsigned long*  pp;
-	unsigned long   pa;
-	unsigned long 	t;
+	uintptr_t*  pp;
+	uintptr_t   pa;
+	uintptr_t 	t;
 	void*		buffer;
 	int i,size,len;
 	co_rc_t rc;
@@ -497,7 +497,7 @@ static void co_monitor_getpp(co_monitor_t* cmon,
 	while(size > 0) {
 		rc = co_monitor_get_pfn(cmon, vaddr, &pfn);
 		if (!CO_OK(rc)) {
-			co_debug_error("unable to get pfn for vaddr %08lX", vaddr);
+			co_debug_error("unable to get pfn for vaddr %08I64X", (int64_t)vaddr);
 			co_passage_page->params[0] = 1;
 			return;
 		}
@@ -507,7 +507,7 @@ static void co_monitor_getpp(co_monitor_t* cmon,
 
 		page = co_os_map(cmon->manager, pfn);
 
-		pp = (unsigned long *)(page + (vaddr & ~CO_ARCH_PAGE_MASK));
+		pp = (uintptr_t *)(page + (vaddr & ~CO_ARCH_PAGE_MASK));
 		co_memset(pp, 0, len);
 
 		t = vaddr;
@@ -626,7 +626,7 @@ static bool_t iteration(co_monitor_t *cmon)
 		break;
 	}
 
-	co_debug_lvl(context_switch, 14, "switching to linux (%ld)", co_passage_page->operation);
+	co_debug_lvl(context_switch, 14, "switching to linux (%I64d)", (int64_t)co_passage_page->operation);
 	co_host_switch_wrapper(cmon);
 
 	if (co_passage_page->operation == CO_OPERATION_FORWARD_INTERRUPT)
@@ -643,7 +643,7 @@ static bool_t iteration(co_monitor_t *cmon)
 	case CO_OPERATION_ALLOC_PAGES: {
 		co_rc_t rc;
 		rc = co_alloc_pages(cmon, co_passage_page->params[0], co_passage_page->params[1]);
-		co_passage_page->params[4] = (unsigned long)(rc);
+		co_passage_page->params[4] = (uintptr_t)(rc);
 		return PTRUE;
 	}
 
@@ -686,7 +686,7 @@ static bool_t iteration(co_monitor_t *cmon)
 	}
 
 	case CO_OPERATION_DEVICE: {
-		unsigned long device = co_passage_page->params[0];
+		uintptr_t device = co_passage_page->params[0];
 		co_debug_lvl(context_switch, 14, "switching from linux (CO_OPERATION_DEVICE)");
 		return device_request(cmon, device, &co_passage_page->params[1]);
 	}
@@ -706,7 +706,7 @@ static bool_t iteration(co_monitor_t *cmon)
                 return PTRUE;
 
 	default:
-		co_debug_lvl(context_switch, 5, "unknown operation %ld not handled", co_passage_page->operation);
+		co_debug_lvl(context_switch, 5, "unknown operation %I64d not handled", (int64_t)co_passage_page->operation);
 		return PFALSE;
 	}
 
@@ -741,7 +741,7 @@ static co_rc_t load_configuration(co_monitor_t *cmon)
 	}
 
 	for (i=0; i < CO_MODULE_MAX_COBD; i++) {
-		co_monitor_file_block_dev_t *dev;
+		co_monitor_file_block_dev_t *dev=NULL;
 		co_block_dev_desc_t *conf_dev = &cmon->config.block_devs[i];
 		if (!conf_dev->enabled)
 			continue;
@@ -847,8 +847,8 @@ static void free_pseudo_physical_memory(co_monitor_t *monitor)
 static co_rc_t alloc_pp_ram_mapping(co_monitor_t *monitor)
 {
 	co_rc_t rc;
-	unsigned long full_page_tables_size;
-	unsigned long partial_page_table_size;
+	uintptr_t full_page_tables_size;
+	uintptr_t partial_page_table_size;
 
 	co_debug("allocating page frames for pseudo physical RAM");
 
@@ -859,7 +859,7 @@ static co_rc_t alloc_pp_ram_mapping(co_monitor_t *monitor)
 	co_memset(monitor->pp_pfns, 0, sizeof(co_pfn_t *)*PTRS_PER_PGD);
 
 	full_page_tables_size = CO_ARCH_PAGE_SIZE * (monitor->memory_size >> CO_ARCH_PMD_SHIFT);
-	partial_page_table_size = sizeof(unsigned long) *
+	partial_page_table_size = sizeof(uintptr_t) *
 		((monitor->memory_size & ~CO_ARCH_PMD_MASK) >> (CO_ARCH_PAGE_SHIFT));
 
 	rc = co_monitor_scan_and_create_pfns(
@@ -914,7 +914,7 @@ static co_rc_t load_section(co_monitor_t *cmon, co_monitor_ioctl_load_section_t 
 		return CO_RC(ERROR);
 
 	if (params->user_ptr) {
-		co_debug("loading section at 0x%lx (0x%lx bytes)", params->address, params->size);
+		co_debug("loading section at 0x%I64x (0x%I64x bytes)", (int64_t)params->address, (int64_t)params->size);
 		rc = co_monitor_copy_region(cmon, params->address, params->size, params->buf);
 	} else {
 		rc = co_monitor_copy_region(cmon, params->address, params->size, NULL);
@@ -926,7 +926,7 @@ static co_rc_t load_section(co_monitor_t *cmon, co_monitor_ioctl_load_section_t 
 static co_rc_t load_initrd(co_monitor_t *cmon, co_monitor_ioctl_load_initrd_t *params)
 {
 	co_rc_t rc = CO_RC(OK);
-	unsigned long address, pages;
+	uintptr_t address, pages;
 
 	if (cmon->state != CO_MONITOR_STATE_INITIALIZED)
 		return CO_RC(ERROR);
@@ -938,7 +938,7 @@ static co_rc_t load_initrd(co_monitor_t *cmon, co_monitor_ioctl_load_initrd_t *p
 	 */
 	address = CO_ARCH_KERNEL_OFFSET + cmon->memory_size - (pages << CO_ARCH_PAGE_SHIFT);
 
-	co_debug("initrd address: %lx (0x%lx pages)", address, pages);
+	co_debug("initrd address: %I64x (0x%I64x pages)", (int64_t)address, (int64_t)pages);
 
 	if (address <= cmon->core_end + 0x100000) {
 		co_debug_error("initrd is too close to the kernel code, not enough memory)");
@@ -1001,8 +1001,8 @@ static co_rc_t start(co_monitor_t *cmon)
 
 static co_rc_t run(co_monitor_t *cmon,
 		   co_monitor_ioctl_run_t *params,
-		   unsigned long out_size,
-		   unsigned long *return_size)
+		   uintptr_t out_size,
+		   uintptr_t *return_size)
 {
 	*return_size = sizeof(*params);
 
@@ -1116,14 +1116,14 @@ co_rc_t co_monitor_create(co_manager_t*		     manager,
 		cmon->memory_size = cmon->config.ram_size;
 	}
 
-	co_debug("configured to %ld MB", cmon->memory_size);
+	co_debug("configured to %I64d MB", (int64_t)cmon->memory_size);
 
 	if (cmon->memory_size < 8)
 		cmon->memory_size = 8;
 	else if (cmon->memory_size > CO_LOWMEMORY_MAX_MB)
 		cmon->memory_size = CO_LOWMEMORY_MAX_MB;
 
-	co_debug("after adjustments: %ld MB", cmon->memory_size);
+	co_debug("after adjustments: %I64d MB", (int64_t)cmon->memory_size);
 
 	cmon->memory_size <<= 20; /* Megify */
 
@@ -1217,7 +1217,7 @@ static co_rc_t co_monitor_destroy(co_monitor_t *cmon, bool_t user_context)
 	manager = cmon->manager;
 
 	co_debug("cleaning up");
-	co_debug("before free: %ld blocks", cmon->blocks_allocated);
+	co_debug("before free: %I64d blocks", (int64_t)cmon->blocks_allocated);
 
 	if (cmon->state == CO_MONITOR_STATE_RUNNING ||
 	    cmon->state == CO_MONITOR_STATE_STARTED)
@@ -1247,7 +1247,7 @@ static co_rc_t co_monitor_destroy(co_monitor_t *cmon, bool_t user_context)
 	co_console_destroy(cmon->console);
 	co_monitor_arch_passage_page_free(cmon);
 
-	co_debug("after free: %ld blocks", cmon->blocks_allocated);
+	co_debug("after free: %I64d blocks", (int64_t)cmon->blocks_allocated);
 	co_os_free(cmon);
 
 	return CO_RC_OK;
@@ -1356,7 +1356,7 @@ static co_rc_t co_monitor_user_get_console(co_monitor_t*                   monit
 	co_message_t*		co_message;
 	co_console_message_t*	message;
 	co_console_cell_t*	cellp;
-	unsigned long		size;
+	uintptr_t		size;
 	int 			y;
 	int			config_x = monitor->console->config.x;
 	int			config_y = monitor->console->config.y;
@@ -1422,9 +1422,9 @@ static co_rc_t co_monitor_user_get_console(co_monitor_t*                   monit
 
 co_rc_t co_monitor_ioctl(co_monitor_t* 		     cmon,
 			 co_manager_ioctl_monitor_t* io_buffer,
-			 unsigned long 		     in_size,
-			 unsigned long 		     out_size,
-			 unsigned long*		     return_size,
+			 uintptr_t 		     in_size,
+			 uintptr_t 		     out_size,
+			 uintptr_t*		     return_size,
 			 co_manager_open_desc_t      opened_manager)
 {
 	co_rc_t rc = CO_RC_ERROR;

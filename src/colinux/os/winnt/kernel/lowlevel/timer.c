@@ -18,7 +18,7 @@ struct co_os_timer {
 	KTIMER ktimer;
 	co_os_func_t func;
 	void *data;
-	long msec;
+	intptr_t msec;
 };
 
 VOID
@@ -36,7 +36,7 @@ co_os_timer_routine(
 }
 
 co_rc_t co_os_timer_create(co_os_func_t func, void *data,
-			   long msec, co_os_timer_t *timer_out)
+			   intptr_t msec, co_os_timer_t *timer_out)
 {
 	co_os_timer_t timer;
 

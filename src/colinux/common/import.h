@@ -11,15 +11,15 @@
 #define __CO_KERNEL_SYMBOLS_IMPORT_H__
 
 typedef struct {
-	unsigned long kernel_start;
-	unsigned long kernel_end;
-	unsigned long kernel_init_task_union;
-	unsigned long kernel_colinux_start;
-	unsigned long kernel_swapper_pg_dir;
-	unsigned long kernel_idt_table;
-	unsigned long kernel_gdt_table;
-	unsigned long kernel_co_arch_info;
-	unsigned long kernel_co_info;
+	uintptr_t kernel_start;
+	uintptr_t kernel_end;
+	uintptr_t kernel_init_task_union;
+	uintptr_t kernel_colinux_start;
+	uintptr_t kernel_swapper_pg_dir;
+	uintptr_t kernel_idt_table;
+	uintptr_t kernel_gdt_table;
+	uintptr_t kernel_co_arch_info;
+	uintptr_t kernel_co_info;
 } co_symbols_import_t;
 
 #endif

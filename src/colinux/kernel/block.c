@@ -25,7 +25,7 @@ void co_monitor_block_unregister_device(co_monitor_t *cmon, unsigned int index)
 
 void co_monitor_unregister_and_free_block_devices(co_monitor_t *cmon)
 {
-	long i;
+	int i;
 
 	for (i = 0; i < CO_MODULE_MAX_COBD; i++) {
 		co_block_dev_t* dev = cmon->block_devs[i];

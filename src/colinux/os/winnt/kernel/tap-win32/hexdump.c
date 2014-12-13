@@ -50,9 +50,9 @@ VOID DisplayDebugString (char *p_Format, ...)
 
 #endif
 
-VOID HexDump (unsigned char *p_Buffer, unsigned long p_Size)
+VOID HexDump (unsigned char *p_Buffer, uintptr_t p_Size)
    {
-    unsigned long l_Index, l_Idx;
+    uintptr_t l_Index, l_Idx;
     unsigned char l_Row [17];
 
     for (l_Index = l_Row [16] = 0; l_Index < p_Size || l_Index % 16; ++l_Index)

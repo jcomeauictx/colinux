@@ -52,7 +52,7 @@ static inline co_debug_tlv_t *tlv_add_timestamp(co_debug_tlv_t *sub_tlv)
 	return (co_debug_tlv_t *)&sub_tlv->value[sub_tlv->length];
 }
 
-static inline co_debug_tlv_t *tlv_add_unsigned_long(co_debug_type_t type, unsigned long data, co_debug_tlv_t *sub_tlv)
+static inline co_debug_tlv_t *tlv_add_unsigned_long(co_debug_type_t type, uintptr_t data, co_debug_tlv_t *sub_tlv)
 {
 	sub_tlv->type = type;
 	sub_tlv->length = sizeof(data);
@@ -60,7 +60,7 @@ static inline co_debug_tlv_t *tlv_add_unsigned_long(co_debug_type_t type, unsign
 	return (co_debug_tlv_t *)&sub_tlv->value[sub_tlv->length];
 }
 
-static inline co_debug_tlv_t *tlv_add_char(co_debug_type_t type, unsigned long data, co_debug_tlv_t *sub_tlv)
+static inline co_debug_tlv_t *tlv_add_char(co_debug_type_t type, uintptr_t data, co_debug_tlv_t *sub_tlv)
 {
 	sub_tlv->type = type;
 	sub_tlv->length = sizeof(data);

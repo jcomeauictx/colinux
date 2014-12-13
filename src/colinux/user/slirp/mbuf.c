@@ -84,7 +84,7 @@ m_get()
 	m->m_nextpkt = 0;
 	m->m_prevpkt = 0;
 end_error:
-	DEBUG_ARG("m = %lx", (long )m);
+	DEBUG_ARG("m = %x", (int )m);
 	return m;
 }
 
@@ -94,7 +94,7 @@ m_free(m)
 {
 
   DEBUG_CALL("m_free");
-  DEBUG_ARG("m = %lx", (long )m);
+  DEBUG_ARG("m = %x", (int )m);
 
   if(m) {
 	/* Remove from m_usedlist */
@@ -224,7 +224,7 @@ dtom(dat)
 	struct mbuf *m;
 
 	DEBUG_CALL("dtom");
-	DEBUG_ARG("dat = %lx", (long )dat);
+	DEBUG_ARG("dat = %x", (int )dat);
 
 	/* bug corrected for M_EXT buffers */
 	for (m = m_usedlist.m_next; m != &m_usedlist; m = m->m_next) {

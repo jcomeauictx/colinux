@@ -17,13 +17,13 @@
 extern co_rc_t co_manager_io_monitor(co_manager_handle_t handle,
 				     co_monitor_ioctl_op_t op,
 				     co_manager_ioctl_monitor_t *ioctl,
-				     unsigned long in_size,
-				     unsigned long out_size);
+				     uintptr_t in_size,
+				     uintptr_t out_size);
 
 extern co_rc_t co_manager_io_monitor_unisize(co_manager_handle_t handle,
 					     co_monitor_ioctl_op_t op,
 					     co_manager_ioctl_monitor_t *ioctl,
-					     unsigned long size);
+					     uintptr_t size);
 
 extern co_rc_t co_manager_status(co_manager_handle_t handle,
 				 co_manager_ioctl_status_t *status);
@@ -32,7 +32,7 @@ extern co_rc_t co_manager_info(co_manager_handle_t handle,
 				 co_manager_ioctl_info_t *status);
 
 extern void co_manager_debug(co_manager_handle_t handle,
-			     const char *buf, long size);
+			     const char *buf, int size);
 
 extern co_rc_t co_manager_debug_reader(co_manager_handle_t handle,
 				       co_manager_ioctl_debug_reader_t *debug_reader);

@@ -198,8 +198,10 @@ install_winpcap()
 	    Include/bittypes.h \
 	    Include/ip6_misc.h \
 	    "$PREFIX/$TARGET/include"
+	cp -p -r Include/pcap \
+	    "$PREFIX/$TARGET/include"
 	test $? -ne 0 && error_exit 10 "winpcap install headers failed"
-	cp -p Lib/libwpcap.a "$PREFIX/$TARGET/lib"
+	cp -p "$USER_TOPDIR/pcap-lib/libwpcap.a" "$PREFIX/$TARGET/lib"
 	test $? -ne 0 && error_exit 10 "winpcap install lib failed"
 }
 

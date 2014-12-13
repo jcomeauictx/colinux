@@ -105,7 +105,7 @@ static void co_debug_download_to_network(void)
 		}
 
 		co_debug_tlv_t *tlv;
-		unsigned long size = debug_reader.filled;
+		uintptr_t size = debug_reader.filled;
 		char *block = debug_reader.user_buffer;
 
 		while (size > 0) {
@@ -208,7 +208,7 @@ static void parse_tlv(const co_debug_tlv_t *tlv, const char *block)
 
 }
 
-static void parse_tlv_buffer(const char *block, long size)
+static void parse_tlv_buffer(const char *block, int size)
 {
 	co_debug_tlv_t *tlv;
 
@@ -322,13 +322,13 @@ void co_debug_download_and_parse(void)
 
 typedef struct {
 	char *facility_name;
-	unsigned long facility_offset;
+	uintptr_t facility_offset;
 } facility_descriptor_t;
 
 #ifdef COLINUX_DEBUG
 static facility_descriptor_t facility_descriptors[] = {
 #define X(facility, static_level, default_dynamic_level) \
-	{#facility, (((unsigned long)&(((co_debug_levels_t *)0)->facility##_level)))/sizeof(int)},
+	{#facility, (((uintptr_t)&(((co_debug_levels_t *)0)->facility##_level)))/sizeof(int)},
 		CO_DEBUG_LIST
 #undef X
 		{NULL, 0},
@@ -472,12 +472,12 @@ co_rc_t co_debug_main(int argc, char *argv[])
 
 	if (parameters.rc_specified) {
 		char buf[0x100];
-		unsigned long exitcode;
+		uintptr_t exitcode;
 
 		exitcode = strtoul(parameters.rc_str, NULL, 16);
 		co_rc_format_error((co_rc_t)exitcode, buf, sizeof(buf));
 
-		printf(" Translate error code %lx\n", exitcode);
+		printf(" Translate error code %I64x\n", (int64_t)exitcode);
 		printf(" %s\n", buf);
 		return CO_RC(OK);
 	}

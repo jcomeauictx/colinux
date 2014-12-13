@@ -169,7 +169,7 @@ static int global_event_hook(const XEvent& thisevent)
 	return 0;
 }
 
-void co_user_console_keyboard_focus_change(unsigned long keyboard_focus)
+void co_user_console_keyboard_focus_change(uintptr_t keyboard_focus)
 {
 }
 

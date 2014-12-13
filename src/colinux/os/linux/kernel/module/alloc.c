@@ -12,7 +12,7 @@
 static int blocks = 0;
 #endif
 
-void *co_os_malloc(unsigned long bytes)
+void *co_os_malloc(uintptr_t bytes)
 {
 	void *ret;
 
@@ -37,7 +37,7 @@ void co_os_free(void *ptr)
 co_rc_t co_os_userspace_map(void *address, unsigned int pages, void **user_address_out, void **handle_out)
 {
 	struct file *filp;
-	unsigned long pa;
+	uintptr_t pa;
 	void *result;
 
 	filp = filp_open("/dev/kmem", O_RDWR | O_LARGEFILE, 0);
@@ -53,7 +53,7 @@ co_rc_t co_os_userspace_map(void *address, unsigned int pages, void **user_addre
 		return CO_RC(ERROR);
 	}
 
-	result = (void *)do_mmap_pgoff(filp, 0, ((unsigned long)pages) << PAGE_SHIFT,
+	result = (void *)do_mmap_pgoff(filp, 0, ((uintptr_t)pages) << PAGE_SHIFT,
 					     PROT_EXEC | PROT_READ | PROT_WRITE,
 #if LINUX_VERSION_CODE == KERNEL_VERSION(2,6,12)
 					     MAP_SHARED,
@@ -83,7 +83,7 @@ void co_os_userspace_unmap(void *user_address, void *handle, unsigned int pages)
 	struct file *filp = (struct file *)handle;
 
 	if (user_address)
-		do_munmap(current->mm, (unsigned long)user_address, ((unsigned long)pages) << PAGE_SHIFT);
+		do_munmap(current->mm, (uintptr_t)user_address, ((uintptr_t)pages) << PAGE_SHIFT);
 
 	filp_close(filp, NULL);
 }

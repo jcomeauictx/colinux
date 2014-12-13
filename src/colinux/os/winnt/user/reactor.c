@@ -61,12 +61,14 @@ static co_rc_t packet_read_async(co_winnt_reactor_packet_user_t handle)
 {
 	BOOL result;
 	DWORD error;
+	DWORD size=handle->size;
 
 	result = ReadFile(handle->rhandle,
 			  &handle->buffer,
 			  sizeof(handle->buffer),
-			  &handle->size,
+			  &size,
 			  &handle->read_overlapped);
+	handle->size = size;
 
 	if (!result) {
 		error = GetLastError();
@@ -76,7 +78,7 @@ static co_rc_t packet_read_async(co_winnt_reactor_packet_user_t handle)
 			return CO_RC(OK);
 		case ERROR_NOT_ENOUGH_MEMORY:
 			/* Hack for serial daemon */
-			co_debug_error("Warn: NOT_ENOUGH_MEMORY (handle=%d)", (int)handle->rhandle);
+			co_debug_error("Warn: NOT_ENOUGH_MEMORY (handle=%I64d)", (int64_t)handle->rhandle);
 			return CO_RC(OUT_OF_MEMORY);
 		default:
 			co_debug_error("Error: 0x%lx", error);
@@ -90,10 +92,12 @@ static co_rc_t packet_read_async(co_winnt_reactor_packet_user_t handle)
 static co_rc_t packet_read_completed(co_winnt_reactor_packet_user_t handle)
 {
 	BOOL result;
+	DWORD size=handle->size;
 
 	result = GetOverlappedResult(handle->rhandle,
 				     &handle->read_overlapped,
-				     &handle->size, FALSE);
+				     &size, FALSE);
+	handle->size = size;
 
 	if (result) {
 		handle->user.received(&handle->user, handle->buffer, handle->size);
@@ -111,11 +115,11 @@ static co_rc_t packet_read_completed(co_winnt_reactor_packet_user_t handle)
 }
 
 static co_rc_t packet_send_whole(co_winnt_reactor_packet_user_t handle,
-				 unsigned char *buffer, unsigned long size)
+				 unsigned char *buffer, uintptr_t size)
 {
 	BOOL result;
 	DWORD error;
-	unsigned long write_size;
+	DWORD write_size;
 
 	result = WriteFile(handle->whandle, buffer, size,
 			   &write_size, &handle->write_overlapped);
@@ -141,7 +145,7 @@ static co_rc_t packet_read(co_reactor_user_t user)
 	return packet_read_completed((co_winnt_reactor_packet_user_t)user);
 }
 
-static co_rc_t packet_send(co_reactor_user_t user, unsigned char *buffer, unsigned long size)
+static co_rc_t packet_send(co_reactor_user_t user, unsigned char *buffer, uintptr_t size)
 {
 	return packet_send_whole((co_winnt_reactor_packet_user_t)user, buffer, size);
 }

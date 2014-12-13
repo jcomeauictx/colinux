@@ -58,7 +58,7 @@ extern "C" {
 //===================================================================================
 #define IfPrint(c) (c >= 32 && c < 127 ? c : '.')
 
-VOID HexDump (unsigned char *p_Buffer, unsigned long p_Size);
+VOID HexDump (unsigned char *p_Buffer, uintptr_t p_Size);
 
 #ifdef __cplusplus
 }

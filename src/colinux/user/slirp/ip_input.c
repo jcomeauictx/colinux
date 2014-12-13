@@ -75,7 +75,7 @@ ip_input(m)
 	int hlen;
 
 	DEBUG_CALL("ip_input");
-	DEBUG_ARG("m = %lx", (long)m);
+	DEBUG_ARG("m = %x", (int)m);
 	DEBUG_ARG("m_len = %d", m->m_len);
 
 	ipstat.ips_total++;
@@ -246,9 +246,9 @@ ip_reass(ip, fp)
 	int i, next;
 
 	DEBUG_CALL("ip_reass");
-	DEBUG_ARG("ip = %lx", (long)ip);
-	DEBUG_ARG("fp = %lx", (long)fp);
-	DEBUG_ARG("m = %lx", (long)m);
+	DEBUG_ARG("ip = %x", (int)ip);
+	DEBUG_ARG("fp = %x", (int)fp);
+	DEBUG_ARG("m = %x", (int)m);
 
 	/*
 	 * Presence of header sizes in mbufs
@@ -419,7 +419,7 @@ ip_enq(p, prev)
 	register struct ipasfrag *p, *prev;
 {
 	DEBUG_CALL("ip_enq");
-	DEBUG_ARG("prev = %lx", (long)prev);
+	DEBUG_ARG("prev = %x", (int)prev);
 	p->ipf_prev = (ipasfragp_32) prev;
 	p->ipf_next = prev->ipf_next;
 	((struct ipasfrag *)(prev->ipf_next))->ipf_prev = (ipasfragp_32) p;

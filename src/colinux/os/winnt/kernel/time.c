@@ -3,7 +3,7 @@
 #define DELTA (134774LL*86400)
 #define SCALE (10000000LL)
 
-unsigned long windows_time_to_unix_time(LARGE_INTEGER time)
+uintptr_t windows_time_to_unix_time(LARGE_INTEGER time)
 {
 	/*
 	 * Windows' system time is a count of 100-nanosecond intervals since January 1, 1601.
@@ -25,7 +25,7 @@ unsigned long windows_time_to_unix_time(LARGE_INTEGER time)
 	return time.QuadPart;
 }
 
-LARGE_INTEGER unix_time_to_windows_time(unsigned long time)
+LARGE_INTEGER unix_time_to_windows_time(uintptr_t time)
 {
 	LARGE_INTEGER ret_time;
 

@@ -24,12 +24,12 @@ struct co_manager;
 typedef struct co_debug_section {
 	co_list_t node;
 	char *buffer;
-	long buffer_size;
-	long peak_size;
-	long filled;
+	intptr_t buffer_size;
+	intptr_t peak_size;
+	intptr_t filled;
 	co_os_mutex_t mutex;
 	int refcount;
-	long max_size;
+	intptr_t max_size;
 	bool_t folded;
 } co_debug_section_t;
 
@@ -41,8 +41,8 @@ typedef struct co_manager_debug {
 	co_os_wait_t read_wait;
 	bool_t freeing;
 	int sections_count;
-	long sections_total_size;
-	long sections_total_filled;
+	intptr_t sections_total_size;
+	intptr_t sections_total_filled;
 } co_manager_debug_t;
 
 struct co_manager_per_fd_state;
@@ -51,7 +51,7 @@ extern co_rc_t co_debug_init(co_manager_debug_t *manager);
 
 typedef struct co_debug_write_vector {
 	int vec_size;
-	long size;
+	intptr_t size;
 	union {
 		const char *ptr;
 		struct co_debug_write_vector *vec;
@@ -63,8 +63,8 @@ extern co_rc_t co_debug_write_log(co_manager_debug_t *debug,
 				  co_debug_write_vector_t *vec, int vec_size);
 
 extern co_rc_t co_debug_read(co_manager_debug_t *manager,
-			     char *buf, unsigned long size,
-			     unsigned long *read_size);
+			     char *buf, uintptr_t size,
+			     uintptr_t *read_size);
 
 extern co_rc_t co_debug_fold(co_manager_debug_t *manager,
 			     co_debug_section_t *section);

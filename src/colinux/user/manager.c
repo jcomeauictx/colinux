@@ -15,10 +15,10 @@
 co_rc_t co_manager_io_monitor(co_manager_handle_t	   handle,
 			       co_monitor_ioctl_op_t	   op,
 			       co_manager_ioctl_monitor_t* ioctl,
-			       unsigned long 		   in_size,
-			       unsigned long 		   out_size)
+			       uintptr_t 		   in_size,
+			       uintptr_t 		   out_size)
 {
-	unsigned long returned = 0;
+	uintptr_t returned = 0;
 	co_rc_t	      rc;
 
 	ioctl->op = op;
@@ -40,7 +40,7 @@ co_rc_t co_manager_io_monitor(co_manager_handle_t	   handle,
 co_rc_t co_manager_io_monitor_unisize(co_manager_handle_t         handle,
 				      co_monitor_ioctl_op_t       op,
 				      co_manager_ioctl_monitor_t* ioctl,
-				      unsigned long               size)
+				      uintptr_t               size)
 {
 	return co_manager_io_monitor(handle, op, ioctl, size, size);
 }
@@ -48,7 +48,7 @@ co_rc_t co_manager_io_monitor_unisize(co_manager_handle_t         handle,
 co_rc_t co_manager_status(co_manager_handle_t handle, co_manager_ioctl_status_t* status)
 {
 	co_rc_t		rc;
-	unsigned long 	returned = 0;
+	uintptr_t 	returned = 0;
 
 	rc = co_os_manager_ioctl(handle,
 				 CO_MANAGER_IOCTL_STATUS,
@@ -72,7 +72,7 @@ co_rc_t co_manager_status(co_manager_handle_t handle, co_manager_ioctl_status_t*
 co_rc_t co_manager_info(co_manager_handle_t handle, co_manager_ioctl_info_t* info)
 {
 	co_rc_t rc;
-	unsigned long returned = 0;
+	uintptr_t returned = 0;
 
 	rc = co_os_manager_ioctl(handle,
 				 CO_MANAGER_IOCTL_INFO,
@@ -85,10 +85,10 @@ co_rc_t co_manager_info(co_manager_handle_t handle, co_manager_ioctl_info_t* inf
 	return rc;
 }
 
-void co_manager_debug(co_manager_handle_t handle, const char* buf, long size)
+void co_manager_debug(co_manager_handle_t handle, const char* buf, int size)
 {
-	unsigned long returned	= 0;
-	unsigned long ret	= 0;
+	uintptr_t returned	= 0;
+	uintptr_t ret	= 0;
 
 	co_os_manager_ioctl(handle,
 			    CO_MANAGER_IOCTL_DEBUG,
@@ -102,7 +102,7 @@ void co_manager_debug(co_manager_handle_t handle, const char* buf, long size)
 co_rc_t co_manager_attach(co_manager_handle_t handle, co_manager_ioctl_attach_t *params)
 {
 	co_rc_t rc;
-	unsigned long returned = 0;
+	uintptr_t returned = 0;
 
 	rc = co_os_manager_ioctl(handle, CO_MANAGER_IOCTL_ATTACH,
 				 params, sizeof(*params), params, sizeof(*params), &returned);
@@ -116,7 +116,7 @@ co_rc_t co_manager_attach(co_manager_handle_t handle, co_manager_ioctl_attach_t 
 co_rc_t co_manager_debug_reader(co_manager_handle_t handle, co_manager_ioctl_debug_reader_t *debug_reader)
 {
 	co_rc_t rc;
-	unsigned long returned = 0;
+	uintptr_t returned = 0;
 
 	rc = co_os_manager_ioctl(handle, CO_MANAGER_IOCTL_DEBUG_READER,
 				 debug_reader, sizeof(*debug_reader), debug_reader, sizeof(*debug_reader), &returned);
@@ -132,7 +132,7 @@ co_rc_t co_manager_debug_reader(co_manager_handle_t handle, co_manager_ioctl_deb
 co_rc_t co_manager_debug_levels(co_manager_handle_t handle, co_manager_ioctl_debug_levels_t *levels)
 {
 	co_rc_t rc;
-	unsigned long returned = 0;
+	uintptr_t returned = 0;
 
 	rc = co_os_manager_ioctl(handle, CO_MANAGER_IOCTL_DEBUG_LEVELS,
 				 levels, sizeof(*levels), levels, sizeof(*levels), &returned);
@@ -150,7 +150,7 @@ co_rc_t co_manager_debug_levels(co_manager_handle_t handle, co_manager_ioctl_deb
 co_rc_t co_manager_monitor_list(co_manager_handle_t handle, co_manager_ioctl_monitor_list_t *list)
 {
 	co_rc_t rc;
-	unsigned long returned = 0;
+	uintptr_t returned = 0;
 
 	rc = co_os_manager_ioctl(handle, CO_MANAGER_IOCTL_MONITOR_LIST,
  				 list, sizeof(*list), list, sizeof(*list), &returned);

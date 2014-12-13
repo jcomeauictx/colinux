@@ -22,17 +22,17 @@ void co_winnt_free_unicode(UNICODE_STRING *unicode_str);
 co_rc_t co_status_convert(NTSTATUS status);
 
 extern co_rc_t co_os_file_open(char *pathname, PHANDLE FileHandle,
-			       unsigned long open_flags);
+			       uintptr_t open_flags);
 
-extern co_rc_t co_os_file_create(char *pathname, PHANDLE FileHandle, unsigned long open_flags,
-				 unsigned long file_attribute, unsigned long create_disposition,
-				 unsigned long options);
+extern co_rc_t co_os_file_create(char *pathname, PHANDLE FileHandle, uintptr_t open_flags,
+				 uintptr_t file_attribute, uintptr_t create_disposition,
+				 uintptr_t options);
 
 extern co_rc_t co_os_file_block_read_write(co_monitor_t *monitor,
 					   HANDLE file_handle,
 					   unsigned long long offset,
 					   vm_ptr_t address,
-					   unsigned long size,
+					   uintptr_t size,
 					   bool_t read);
 
 extern co_rc_t co_os_file_close(PHANDLE FileHandle);

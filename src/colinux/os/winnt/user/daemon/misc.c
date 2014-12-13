@@ -23,11 +23,11 @@ void co_winnt_affinity_workaround(void)
 	// Prevent coLinux from using CPU0
 	env = getenv("COLINUX_NO_CPU0_WORKAROUND");
 	if (env && strcmp(env, "Y") == 0) {
-		DWORD ProcessMask, SystemMask, NewMask;
+		DWORD_PTR ProcessMask, SystemMask, NewMask;
 
 		if (GetProcessAffinityMask (hProcess, &ProcessMask, &SystemMask)) {
 			NewMask = SystemMask & ~1;
-			co_debug("AffinityMasks Process %lx, System %lx, New %lx", ProcessMask, SystemMask, NewMask);
+			co_debug("AffinityMasks Process %lx, System %lx, New %lx", (DWORD)ProcessMask, (DWORD)SystemMask, (DWORD)NewMask);
 			if (NewMask != ProcessMask) {
 				if (!SetProcessAffinityMask(hProcess, NewMask)) {
 					co_debug("SetProcessAffinityMask failed with 0x%lx", GetLastError());

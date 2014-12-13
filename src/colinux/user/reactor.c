@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <colinux/os/alloc.h>
 #include <colinux/common/libc.h>
 #include <colinux/os/user/reactor.h>

@@ -31,8 +31,8 @@ co_rc_t co_manager_get_page(struct co_manager *manager, co_pfn_t *pfn)
 	if (*pfn >= manager->hostmem_pages) {
 		/* Surprise! We have a bug! */
 
-		co_debug_error("PFN too high! %ld >= %ld",
-			 *pfn, manager->hostmem_pages);
+		co_debug_error("PFN too high! %I64d >= %I64d",
+			 (int64_t)*pfn, (int64_t)manager->hostmem_pages);
 
 		return CO_RC(ERROR);
 	}
@@ -47,7 +47,7 @@ co_rc_t co_manager_get_page(struct co_manager *manager, co_pfn_t *pfn)
 
 co_rc_t co_monitor_get_pfn(co_monitor_t *cmon, vm_ptr_t address, co_pfn_t *pfn)
 {
-	unsigned long current_pfn, pfn_group, pfn_index;
+	uintptr_t current_pfn, pfn_group, pfn_index;
 
 	current_pfn = (address >> CO_ARCH_PAGE_SHIFT);
 	pfn_group = current_pfn / PTRS_PER_PTE;
@@ -61,19 +61,19 @@ co_rc_t co_monitor_get_pfn(co_monitor_t *cmon, vm_ptr_t address, co_pfn_t *pfn)
 }
 
 typedef co_rc_t (*co_split_by_pages_callback_t)(
-	unsigned long offset,
-	unsigned long size,
+	uintptr_t offset,
+	uintptr_t size,
 	void **data
 	);
 
 co_rc_t co_split_by_pages_and_callback(
-	unsigned long offset,
-	unsigned long size,
+	uintptr_t offset,
+	uintptr_t size,
 	void **data,
 	co_split_by_pages_callback_t func
 	)
 {
-	unsigned long part_size;
+	uintptr_t part_size;
 	co_rc_t rc;
 
 	/* Split page one by one (including partials) */
@@ -96,7 +96,7 @@ co_rc_t co_split_by_pages_and_callback(
 typedef co_rc_t (*co_manager_scan_pfns_callback_t)(
 	void *mapped_ptr,
 	void **data,
-	unsigned long size
+	uintptr_t size
 	);
 
 typedef struct {
@@ -108,15 +108,15 @@ typedef struct {
 
 static co_rc_t
 scan_pfns_split_callback(
-	unsigned long offset,
-	unsigned long size,
+	uintptr_t offset,
+	uintptr_t size,
 	void **data
 	)
 {
 	co_manager_scan_pfns_callback_data_t *cbdata;
-	unsigned long current_pfn, pfn_group;
+	uintptr_t current_pfn, pfn_group;
 	void *mapped_page;
-	co_pfn_t real_pfn, **pp_pfns;
+	co_pfn_t real_pfn=0, **pp_pfns;
 	co_rc_t rc;
 
 	cbdata = (typeof(cbdata))(data);
@@ -158,7 +158,7 @@ scan_pfns_split_callback(
 co_rc_t co_manager_scan_pfns_and_callback(
 	co_monitor_t *monitor,
 	vm_ptr_t address,
-	unsigned long size,
+	uintptr_t size,
 	co_manager_scan_pfns_callback_t func,
 	void **data,
 	bool_t alloc_pages
@@ -179,7 +179,7 @@ static co_rc_t
 copy_callback(
 	void *mapped_ptr,
 	void **data,
-	unsigned long size
+	uintptr_t size
 	)
 {
 	co_memcpy(mapped_ptr, *data, size);
@@ -199,7 +199,7 @@ co_rc_t
 co_monitor_copy_and_create_pfns(
 	co_monitor_t *monitor,
 	vm_ptr_t address,
-	unsigned long size,
+	uintptr_t size,
 	char *source
 	)
 {
@@ -218,7 +218,7 @@ co_rc_t
 co_monitor_scan_and_create_pfns(
 	co_monitor_t *monitor,
 	vm_ptr_t address,
-	unsigned long size
+	uintptr_t size
 	)
 {
 	return co_manager_scan_pfns_and_callback(
@@ -230,7 +230,7 @@ static co_rc_t
 create_ptes_callback(
 	void *mapped_ptr,
 	void **data,
-	unsigned long size
+	uintptr_t size
 	)
 {
 	co_pfn_t *pfns = (co_pfn_t *)(*data);
@@ -266,7 +266,7 @@ co_rc_t
 co_monitor_create_ptes(
 	co_monitor_t *monitor,
 	vm_ptr_t address,
-	unsigned long size,
+	uintptr_t size,
 	co_pfn_t *source
 	)
 {
@@ -284,8 +284,8 @@ typedef struct {
 
 static co_rc_t
 copy_region_split_callback(
-	unsigned long offset,
-	unsigned long size,
+	uintptr_t offset,
+	uintptr_t size,
 	void **data)
 {
 	co_monitor_copy_region_callback_data_t *cbdata;
@@ -321,7 +321,7 @@ copy_region_split_callback(
 co_rc_t co_monitor_copy_region(
 	struct co_monitor *monitor,
 	vm_ptr_t address,
-	unsigned long size,
+	uintptr_t size,
 	void *data_to_copy
 	)
 {
@@ -345,9 +345,9 @@ co_rc_t co_monitor_alloc_and_map_page(
 {
 	co_rc_t rc;
 	vm_ptr_t pte_address;
-	long virtual_pfn;
+	uintptr_t virtual_pfn;
 	co_pfn_t physical_pfn;
-	unsigned long current_pfn, pfn_group, pfn_index;
+	uintptr_t current_pfn, pfn_group, pfn_index;
 
 	/* first, allocate the page if needed. */
 
@@ -404,10 +404,10 @@ co_rc_t co_monitor_free_and_unmap_page(
 	vm_ptr_t address
 	)
 {
-	unsigned long physical_pfn = 0;
+	uintptr_t physical_pfn = 0;
 	vm_ptr_t pte_address;
-	long virtual_pfn;
-	unsigned long current_pfn, pfn_group, pfn_index;
+	intptr_t virtual_pfn;
+	uintptr_t current_pfn, pfn_group, pfn_index;
 
 	current_pfn = (address >> CO_ARCH_PAGE_SHIFT);
 	pfn_group = current_pfn / PTRS_PER_PTE;

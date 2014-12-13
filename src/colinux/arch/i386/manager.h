@@ -19,7 +19,7 @@
 
 struct co_archdep_manager {
 	bool_t has_cpuid;
-	unsigned long caps[2];
+	uintptr_t caps[2];
 };
 
 struct co_archdep_monitor {

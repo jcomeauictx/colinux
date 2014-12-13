@@ -17,7 +17,7 @@
 static co_rc_t co_message_dup(co_message_t*  message,
                               co_message_t** dup_message_out)
 {
-	unsigned long size;
+	uintptr_t size;
 	co_message_t* allocated;
 
 	size = sizeof(*message) + message->size;
@@ -35,7 +35,7 @@ static co_rc_t co_message_dup(co_message_t*  message,
 
 co_rc_t co_message_dup_to_queue(co_message_t* message, co_queue_t* queue)
 {
-	co_message_t* dup_message;
+	co_message_t* dup_message=NULL;
 	co_rc_t	      rc;
 
 	rc = co_message_dup(message, &dup_message);

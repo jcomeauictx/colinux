@@ -357,8 +357,8 @@ co_rc_t console_widget_t::handle_console_event(co_console_message_t* message)
 	{
 	case CO_OPERATION_CONSOLE_SCROLL_UP:
 	case CO_OPERATION_CONSOLE_SCROLL_DOWN: {
-		unsigned long t = message->scroll.top;		/* Start of scroll region (row) */
-		unsigned long b = message->scroll.bottom + 1;  	/* End of scroll region (row)	*/
+		uintptr_t t = message->scroll.top;		/* Start of scroll region (row) */
+		uintptr_t b = message->scroll.bottom + 1;  	/* End of scroll region (row)	*/
 
 		damage_console(0, t, console->config.x, b - t + 1);
 		break;

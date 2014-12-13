@@ -51,5 +51,5 @@ void *co_os_alloc_pages(unsigned int pages)
 
 void co_os_free_pages(void *ptr, unsigned int pages)
 {
-	free_pages((unsigned long)ptr, get_order(pages << PAGE_SHIFT));
+	free_pages((uintptr_t)ptr, get_order(pages << PAGE_SHIFT));
 }

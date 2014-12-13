@@ -72,18 +72,15 @@ void co_os_manager_close(co_manager_handle_t handle)
 
 co_rc_t co_os_manager_ioctl(
 	co_manager_handle_t kernel_device,
-	unsigned long	    code,
+	uintptr_t	    code,
 	void*	            input_buffer,
-	unsigned long	    input_buffer_size,
+	uintptr_t	    input_buffer_size,
 	void*		    output_buffer,
-	unsigned long	    output_buffer_size,
-	unsigned long*	    output_returned)
+	uintptr_t	    output_buffer_size,
+	uintptr_t*	    output_returned)
 {
 	DWORD   BytesReturned = 0;
 	BOOL    rc;
-
-	if (output_returned == NULL)
-		output_returned = &BytesReturned;
 
 	code = CO_WINNT_IOCTL(code);
 
@@ -93,8 +90,11 @@ co_rc_t co_os_manager_ioctl(
 			     input_buffer_size,
 			     output_buffer,
 			     output_buffer_size,
-			     output_returned,
+			     &BytesReturned,
 			     NULL);
+
+	if (output_returned != NULL)
+		*output_returned = BytesReturned;
 
 	if (rc == FALSE) {
 		return CO_RC(ERROR);

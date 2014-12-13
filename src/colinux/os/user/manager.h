@@ -28,12 +28,12 @@ extern void co_os_manager_close(co_manager_handle_t handle);
 
 extern co_rc_t co_os_manager_ioctl(
 	co_manager_handle_t 	kernel_device,
-	unsigned long 		code,
+	uintptr_t 		code,
 	void*			input_buffer,
-	unsigned long		input_buffer_size,
+	uintptr_t		input_buffer_size,
 	void*			output_buffer,
-	unsigned long		output_buffer_size,
-	unsigned long*		output_returned);
+	uintptr_t		output_buffer_size,
+	uintptr_t*		output_returned);
 
 extern co_rc_t co_os_manager_is_installed(bool_t* installed);
 

@@ -163,7 +163,7 @@ co_rc_t co_winnt_status_driver(int verbose)
 	}
 
 	if (verbose) {
-		co_terminal_print("current state: %ld%s\n", status.state,
+		co_terminal_print("current state: %I64d%s\n", (int64_t)status.state,
 				  (status.state >= CO_MANAGER_STATE_INITIALIZED) ?
 				  " (fully initialized)" : "");
 		co_terminal_print("current number of monitors: %d\n", status.monitors_count);

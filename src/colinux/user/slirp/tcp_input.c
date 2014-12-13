@@ -254,8 +254,8 @@ tcp_input(m, iphlen, inso)
 /*	int ts_present = 0; */
 
 	DEBUG_CALL("tcp_input");
-	DEBUG_ARGS((dfd," m = %8lx  iphlen = %2d  inso = %lx\n",
-		    (long )m, iphlen, (long )inso ));
+	DEBUG_ARGS((dfd," m = %8x  iphlen = %2d  inso = %x\n",
+		    (int )m, iphlen, (int )inso ));
 
 	/*
 	 * If called with m == 0, then we're continuing the connect
@@ -1090,8 +1090,8 @@ trimthenstep6:
 		if (SEQ_LEQ(ti->ti_ack, tp->snd_una)) {
 			if (ti->ti_len == 0 && tiwin == tp->snd_wnd) {
 			  tcpstat.tcps_rcvdupack++;
-			  DEBUG_MISC((dfd," dup ack  m = %lx  so = %lx \n",
-				      (long )m, (long )so));
+			  DEBUG_MISC((dfd," dup ack  m = %x  so = %x \n",
+				      (int )m, (int )so));
 				/*
 				 * If we have outstanding data (other than
 				 * a window probe), this is a completely
@@ -1518,7 +1518,7 @@ tcp_dooptions(tp, cp, cnt, ti)
 	int opt, optlen;
 
 	DEBUG_CALL("tcp_dooptions");
-	DEBUG_ARGS((dfd," tp = %lx  cnt=%i \n", (long )tp, cnt));
+	DEBUG_ARGS((dfd," tp = %lx  cnt=%i \n", (int )tp, cnt));
 
 	for (; cnt > 0; cnt -= optlen, cp += optlen) {
 		opt = cp[0];
@@ -1630,7 +1630,7 @@ tcp_xmit_timer(tp, rtt)
 	register short delta;
 
 	DEBUG_CALL("tcp_xmit_timer");
-	DEBUG_ARG("tp = %lx", (long)tp);
+	DEBUG_ARG("tp = %lx", (int)tp);
 	DEBUG_ARG("rtt = %d", rtt);
 
 	tcpstat.tcps_rttupdated++;
@@ -1721,7 +1721,7 @@ tcp_mss(tp, offer)
 	int mss;
 
 	DEBUG_CALL("tcp_mss");
-	DEBUG_ARG("tp = %lx", (long)tp);
+	DEBUG_ARG("tp = %lx", (int)tp);
 	DEBUG_ARG("offer = %d", offer);
 
 	mss = min(if_mtu, if_mru) - sizeof(struct tcpiphdr);

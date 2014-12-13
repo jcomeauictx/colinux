@@ -87,7 +87,7 @@ udp_input(m, iphlen)
 	struct socket *so;
 
 	DEBUG_CALL("udp_input");
-	DEBUG_ARG("m = %lx", (long)m);
+	DEBUG_ARG("m = %x", (int)m);
 	DEBUG_ARG("iphlen = %d", iphlen);
 
 	udpstat.udps_ipackets++;
@@ -265,10 +265,10 @@ int udp_output2(struct socket *so, struct mbuf *m,
 	int error = 0;
 
 	DEBUG_CALL("udp_output");
-	DEBUG_ARG("so = %lx", (long)so);
-	DEBUG_ARG("m = %lx", (long)m);
-	DEBUG_ARG("saddr = %lx", (long)saddr->sin_addr.s_addr);
-	DEBUG_ARG("daddr = %lx", (long)daddr->sin_addr.s_addr);
+	DEBUG_ARG("so = %l", (int)so);
+	DEBUG_ARG("m = %l", (int)m);
+	DEBUG_ARG("saddr = %l", (int)saddr->sin_addr.s_addr);
+	DEBUG_ARG("daddr = %l", (int)daddr->sin_addr.s_addr);
 
 	/*
 	 * Adjust for header

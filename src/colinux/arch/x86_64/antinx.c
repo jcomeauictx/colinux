@@ -37,19 +37,18 @@ co_rc_t co_arch_anti_nx_init(co_monitor_t *mon)
 {
 	co_archdep_monitor_t archdep;
 	co_archdep_manager_t marchdep;
-	co_rc_t rc;
 	bool_t pae_enabled;
 	co_pfn_t pfn, pfn_next;
-	unsigned long cr3;
+	uintptr_t cr3;
 	unsigned char *page;
 	unsigned long long *ptes;
-	unsigned long vaddr;
+	uintptr_t vaddr;
 
 	archdep = mon->archdep;
 	marchdep = mon->manager->archdep;
-	vaddr = (unsigned long)mon->passage_page;
+	vaddr = (uintptr_t)mon->passage_page;
 
-	co_debug_lvl(misc, 11, "vaddr = %08lx", vaddr);
+	co_debug_lvl(misc, 11, "vaddr = %08I64x", (int64_t)vaddr);
 
 	if (!(marchdep->caps[1] & (1 << CO_ARCH_AMD_FEATURE_NX))) {
 		co_debug("AMD's NX is not enabled");
@@ -63,12 +62,11 @@ co_rc_t co_arch_anti_nx_init(co_monitor_t *mon)
 	}
 
 	cr3 = co_get_cr3();
-	co_debug_lvl(misc, 11, "cr3 = %08lx", cr3);
+	co_debug_lvl(misc, 11, "cr3 = %08I64x", (uint64_t)cr3);
 	pfn = cr3 >> CO_ARCH_PAGE_SHIFT;
-	co_debug("pfn = %08lx", (long)pfn);
+	co_debug("pfn = %08I64x", (uint64_t)pfn);
 	page = co_os_map(mon->manager, pfn);
 	if (!page) {
-		rc = CO_RC(ERROR);
 		goto out;
 	}
 
@@ -76,13 +74,12 @@ co_rc_t co_arch_anti_nx_init(co_monitor_t *mon)
 	ptes = ((unsigned long long *)&(page[((cr3 & (~CO_ARCH_PAGE_MASK)) & ~0x1f)]));
 	co_debug_lvl(misc, 11, "ptes = %p", ptes);
 	pfn_next = ptes[vaddr >> CO_ARCH_PAE_PGD_SHIFT] >> CO_ARCH_PAGE_SHIFT;
-	co_debug_lvl(misc, 11, "pfn_next = %08lx", pfn_next);
+	co_debug_lvl(misc, 11, "pfn_next = %08I64x", (uint64_t)pfn_next);
 	co_os_unmap(mon->manager, page, pfn);
 	pfn = pfn_next;
 
 	page = co_os_map(mon->manager, pfn);
 	if (!page) {
-		rc = CO_RC(ERROR);
 		goto out;
 	}
 
@@ -93,13 +90,12 @@ co_rc_t co_arch_anti_nx_init(co_monitor_t *mon)
 
 	if (!(*ptes & _PAGE_PSE)) {
 		pfn_next = (*ptes) >> CO_ARCH_PAGE_SHIFT;
-		co_debug_lvl(misc, 11, "pfn_next = %08lx", pfn_next);
+		co_debug_lvl(misc, 11, "pfn_next = %08I64x", (uint64_t)pfn_next);
 		co_os_unmap(mon->manager, page, pfn);
 		pfn = pfn_next;
 
 		page = co_os_map(mon->manager, pfn);
 		if (!page) {
-			rc = CO_RC(ERROR);
 			goto out;
 		}
 

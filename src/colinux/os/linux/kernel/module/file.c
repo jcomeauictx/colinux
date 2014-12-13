@@ -21,7 +21,7 @@ typedef struct {
 
 static
 co_rc_t co_os_transfer_file_block(struct co_monitor *cmon,
-				  void *host_data, void *linuxvm, unsigned long size,
+				  void *host_data, void *linuxvm, uintptr_t size,
 				  co_monitor_transfer_dir_t dir)
 {
 	co_os_transfer_file_block_data_t *data;
@@ -87,7 +87,7 @@ co_rc_t co_os_file_block_read(struct co_monitor *linuxvm,
 					      &data,
 					      co_os_transfer_file_block,
 					      request->address,
-					      (unsigned long)request->size,
+					      (uintptr_t)request->size,
 					      CO_MONITOR_TRANSFER_FROM_HOST);
 
 	return rc;
@@ -110,7 +110,7 @@ co_rc_t co_os_file_block_write(struct co_monitor *linuxvm,
 					      &data,
 					      co_os_transfer_file_block,
 					      request->address,
-					      (unsigned long)request->size,
+					      (uintptr_t)request->size,
 					      CO_MONITOR_TRANSFER_FROM_LINUX);
 	return rc;
 }

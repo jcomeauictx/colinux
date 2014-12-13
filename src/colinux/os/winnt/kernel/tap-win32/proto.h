@@ -35,7 +35,7 @@
 #define IP_HEADER_SIZE 20
 
 typedef unsigned char MACADDR [6];
-typedef unsigned long IPADDR;
+typedef unsigned int IPADDR;
 
 //-----------------
 // Ethernet address

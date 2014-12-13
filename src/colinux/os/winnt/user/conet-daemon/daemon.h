@@ -18,7 +18,7 @@ public:
 	virtual const char *get_daemon_title();
 	virtual const char *get_extended_syntax();
 	virtual void received_from_monitor(co_message_t *message);
-	virtual void received_from_tap(unsigned char *buffer, unsigned long size);
+	virtual void received_from_tap(unsigned char *buffer, uintptr_t size);
 	virtual void handle_extended_parameters(co_command_line_params_t cmdline);
 	virtual void prepare_for_loop();
 	virtual void syntax();

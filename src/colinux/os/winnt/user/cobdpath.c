@@ -31,18 +31,7 @@
 #endif
 
 #ifndef NTSTATUS
-#define NTSTATUS long
-#endif
-
-#ifdef WIN64
-/*NTOSAPI*/
-NTSTATUS
-NTAPI
-RtlDosPathNameToNtPathName_U(
-  /*IN*/ PCWSTR  DosPathName,
-  /*OUT*/ PUNICODE_STRING  NtPathName,
-  /*OUT*/ PCWSTR  *NtFileNamePart,
-  /*OUT*/ VOID  *DirectoryInfo);
+#define NTSTATUS int
 #endif
 
 co_rc_t co_canonize_cobd_path(co_pathname_t *pathname)

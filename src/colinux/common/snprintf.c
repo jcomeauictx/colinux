@@ -18,17 +18,17 @@
  * Return value is number of characters printed (or number printed
  * if there had been enough room).
  */
-static int pvsnfmt_char(char **pinsertion, long *nmax, const char fmt, int flags,
+static int pvsnfmt_char(char **pinsertion, int *nmax, const char fmt, int flags,
 			int width, int precision, char prefix, va_list *ap);
 
-static int pvsnfmt_int(char **pinsertion, long *nmax, char fmt, int flags,
+static int pvsnfmt_int(char **pinsertion, int *nmax, char fmt, int flags,
 		       int width, int precision, char prefix, va_list *ap);
 
-static int pvsnfmt_str(char **pinsertion, long *nmax, const char fmt, int flags,
+static int pvsnfmt_str(char **pinsertion, int *nmax, const char fmt, int flags,
 		       int width, int precision, char prefix, va_list *ap);
 
 #ifdef SNPRINTF_FLOAT
-static int pvsnfmt_double(char **pinsertion, long *nmax, const char fmt, int flags,
+static int pvsnfmt_double(char **pinsertion, int *nmax, const char fmt, int flags,
 			  int width, int precision, char prefix, va_list *ap);
 #endif
 
@@ -43,7 +43,7 @@ static int pvsnfmt_double(char **pinsertion, long *nmax, const char fmt, int fla
 #define FLAG_HASH            0x10 // #
 
 /* Portable strnlen function (doesn't exist on all systems!) */
-static long pstrnlen(const char *s, long count);
+static int pstrnlen(const char *s, int count);
 
 /* Windows stdlib defines fcvt differently <sigh> */
 #ifdef SNPRINTF_FLOAT
@@ -58,7 +58,7 @@ static long pstrnlen(const char *s, long count);
 #endif
 #endif
 
-int co_snprintf(char *str, long n, const char *format, ...)
+int co_snprintf(char *str, int n, const char *format, ...)
 {
     va_list args;
     int ret;
@@ -197,7 +197,7 @@ int co_snprintf(char *str, long n, const char *format, ...)
     } \
     ncount++;
 
-int co_vsnprintf(char *str, long nmax, const char *format, va_list ap)
+int co_vsnprintf(char *str, int nmax, const char *format, va_list ap)
 {
     /* nmax gives total size of buffer including null
      * null is ALWAYS added, even if buffer too small for format
@@ -326,7 +326,7 @@ int co_vsnprintf(char *str, long nmax, const char *format, va_list ap)
     return ncount;
 }
 
-static int pvsnfmt_char(char **pinsertion, long *nmax, const char fmt, int flags,
+static int pvsnfmt_char(char **pinsertion, int *nmax, const char fmt, int flags,
                  int width, int precision, char prefix, va_list *ap)
 {
     if (*nmax > 1)
@@ -339,7 +339,7 @@ static int pvsnfmt_char(char **pinsertion, long *nmax, const char fmt, int flags
 }
 
 /* strnlen not available on all platforms.. maybe autoconf it? */
-static long pstrnlen(const char *s, long count)
+static int pstrnlen(const char *s, int count)
 {
     const char *p = s;
     while (count-- > 0 && *p)
@@ -358,7 +358,7 @@ static long pstrnlen(const char *s, long count)
  *   ap             Argument list
  */
 
-static int pvsnfmt_str(char **pinsertion, long *nmax, const char fmt, int flags,
+static int pvsnfmt_str(char **pinsertion, int *nmax, const char fmt, int flags,
                 int width, int precision, char prefix, va_list *ap)
 {
     const char *str = va_arg(*ap, const char *);
@@ -452,11 +452,11 @@ static int pvsnfmt_str(char **pinsertion, long *nmax, const char fmt, int flags,
  *   ap             Argument list
  */
 
-static int pvsnfmt_int(char **pinsertion, long *nmax, char fmt, int flags,
+static int pvsnfmt_int(char **pinsertion, int *nmax, char fmt, int flags,
                 int width, int precision, char prefix, va_list *ap)
 {
-    long int number = 0;
-    unsigned long int unumber = 0;
+    int number = 0;
+    uintptr_t unumber = 0;
     char numbersigned = 1;
     char iszero = 0; /* bool */
     int base = 0;
@@ -497,7 +497,7 @@ static int pvsnfmt_int(char **pinsertion, long *nmax, char fmt, int flags,
                 numbersigned = 0;
                 break;
              case 'p':
-                unumber = (unsigned long) va_arg(*ap, void *);
+                unumber = (uintptr_t) va_arg(*ap, void *);
                 numbersigned = 0;
         }
         break;
@@ -506,17 +506,17 @@ static int pvsnfmt_int(char **pinsertion, long *nmax, char fmt, int flags,
         {
             case 'd':
             case 'i':
-                number = va_arg(*ap, signed long int);
+                number = va_arg(*ap, signed int);
                 break;
             case 'u':
             case 'o':
             case 'x':
             case 'X':
-                unumber = va_arg(*ap, unsigned long int);
+                unumber = va_arg(*ap, unsigned int);
                 numbersigned = 0;
                 break;
              case 'p':
-                unumber = (unsigned long) va_arg(*ap, void *);
+                unumber = (uintptr_t) va_arg(*ap, void *);
                 numbersigned = numbersigned;
         }
         break;
@@ -535,7 +535,7 @@ static int pvsnfmt_int(char **pinsertion, long *nmax, char fmt, int flags,
                 numbersigned = 0;
                 break;
              case 'p':
-                unumber = (unsigned long) va_arg(*ap, void *);
+                unumber = (uintptr_t) va_arg(*ap, void *);
                 numbersigned = 0;
          }
     } /* switch fmt to retrieve number */
@@ -758,8 +758,8 @@ static int pvsnfmt_int(char **pinsertion, long *nmax, char fmt, int flags,
 typedef union {
     double D;
     struct {
-        unsigned long W0;
-        unsigned long W1;
+        unsigned int W0;
+        unsigned int W1;
     };
 } DBLBITS;
 
@@ -800,7 +800,7 @@ typedef union {
  *   ap             Argument list
  */
 
-static int pvsnfmt_double(char **pinsertion, long *nmax, const char fmt, int flags,
+static int pvsnfmt_double(char **pinsertion, int *nmax, const char fmt, int flags,
                 int width, int precision, char prefix, va_list *ap)
 {
     char *digits;

@@ -110,7 +110,7 @@ static co_rc_t get_params_list(char *filename, int *count, char ***list_output)
 {
 	co_rc_t rc;
 	char *buf;
-	unsigned long size;
+	uintptr_t size;
 
 	rc = co_os_file_load(filename, &buf, &size, 0);
 	if (!CO_OK(rc)) {
@@ -220,7 +220,7 @@ static co_rc_t eval_params_file(co_command_line_params_t cmdline)
 co_rc_t co_cmdline_params_alloc(char **argv, int argc, co_command_line_params_t *cmdline_out)
 {
 	co_command_line_params_t cmdline;
-	unsigned long argv_size;
+	unsigned int argv_size;
 	co_rc_t rc;
 
 	cmdline = (typeof(cmdline))(malloc(sizeof(struct co_command_line_params)));
@@ -488,9 +488,9 @@ co_rc_t co_cmdline_params_one_arugment_parameter(co_command_line_params_t cmdlin
 
 co_rc_t co_cmdline_params_one_arugment_int_parameter(co_command_line_params_t cmdline,
 						     const char *name,
-						     bool_t *out_exists, unsigned int *out_int)
+						     bool_t *out_exists, uintptr_t *out_int)
 {
-	char arg_buf[0x20];
+	char arg_buf[0x40];
 	co_rc_t rc;
 	char *end_ptr;
 
@@ -499,7 +499,11 @@ co_rc_t co_cmdline_params_one_arugment_int_parameter(co_command_line_params_t cm
 		return rc;
 
 	if (out_exists && *out_exists) {
+#ifdef _WIN64
+		*out_int = strtoull(arg_buf, &end_ptr, 10);
+#else
 		*out_int = strtoul(arg_buf, &end_ptr, 10);
+#endif
 		if (end_ptr == arg_buf)
 			return CO_RC(ERROR);
 	}

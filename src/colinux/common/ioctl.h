@@ -34,7 +34,7 @@ typedef enum {
  * This struct is mapped both in kernel space and userspace.
  */
 typedef struct {
-	unsigned long userspace_msgwait_count;
+	uintptr_t userspace_msgwait_count;
 } co_monitor_user_kernel_shared_t;
 
 /* interface for CO_MANAGER_IOCTL_CREATE: */
@@ -44,7 +44,7 @@ typedef struct {
 	co_config_t	    config;
 	co_info_t	    info;
 	co_arch_info_t	    arch_info;
-	unsigned long	    actual_memsize_used;
+	uintptr_t	    actual_memsize_used;
 	void*		    shared_user_address;
 	co_id_t		    id;
 } co_manager_ioctl_create_t;
@@ -77,8 +77,8 @@ typedef struct {
 
 /* interface for CO_MANAGER_IOCTL_STATUS: */
 typedef struct {
-	unsigned long	state; /* co_manager_state_t */
-	unsigned long	reserved;
+	uintptr_t	state; /* co_manager_state_t */
+	uintptr_t	reserved;
 	int		monitors_count;
 	int		periphery_api_version;
 	int		linux_api_version;
@@ -87,8 +87,8 @@ typedef struct {
 
 /* interface for CO_MANAGER_IOCTL_INFO: */
 typedef struct {
-	unsigned long hostmem_usage_limit;
-	unsigned long hostmem_used;
+	uintptr_t hostmem_usage_limit;
+	uintptr_t hostmem_used;
 } co_manager_ioctl_info_t;
 
 #define CO_MANAGER_ATTACH_MAX_MODULES 0x10
@@ -105,8 +105,8 @@ typedef struct {
 typedef struct {
 	co_rc_t       rc;
 	void*         user_buffer;
-	unsigned long user_buffer_size;
-	unsigned long filled;
+	uintptr_t user_buffer_size;
+	uintptr_t filled;
 } co_manager_ioctl_debug_reader_t;
 
 #ifdef COLINUX_DEBUG
@@ -120,7 +120,7 @@ typedef struct {
 /* interface for CO_MANAGER_IOCTL_MONITOR_LIST: */
 typedef struct {
 	co_rc_t       rc;
-	unsigned long count;
+	uintptr_t count;
 	co_id_t       ids[CO_MAX_MONITORS];
 } co_manager_ioctl_monitor_list_t;
 
@@ -132,16 +132,16 @@ typedef struct {
 typedef struct {
 	co_manager_ioctl_monitor_t pc;
 	char*			   user_ptr;
-	unsigned long		   address;
-	unsigned long		   size;
-	unsigned long		   index;
+	uintptr_t		   address;
+	uintptr_t		   size;
+	uintptr_t		   index;
 	unsigned char		   buf[0];
 } co_monitor_ioctl_load_section_t;
 
 /* interface for CO_MONITOR_IOCTL_LOAD_INITRD: */
 typedef struct {
 	co_manager_ioctl_monitor_t pc;
-	unsigned long		   size;
+	uintptr_t		   size;
 	unsigned char		   buf[0];
 } co_monitor_ioctl_load_initrd_t;
 
@@ -152,15 +152,15 @@ typedef struct {
 } co_monitor_ioctl_get_console_t;
 
 typedef struct {
-	unsigned long	line;
-	unsigned long	code;
+	uintptr_t	line;
+	uintptr_t	code;
 	char		text[128];
 } co_monitor_linux_bug_invocation_t;
 
 /* interface for CO_MONITOR_IOCTL_GET_STATE: */
 typedef struct {
 	co_manager_ioctl_monitor_t 	  pc;
-	unsigned long			  monitor_state;
+	uintptr_t			  monitor_state;
 	co_termination_reason_t		  termination_reason;
 	co_monitor_linux_bug_invocation_t bug_info;
 } co_monitor_ioctl_get_state_t;

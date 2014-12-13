@@ -15,13 +15,13 @@
 #include <colinux/os/alloc.h>
 
 void *
-co_os_malloc(unsigned long size)
+co_os_malloc(uintptr_t size)
 {
 	return malloc(size);
 }
 
 void *
-co_os_realloc(void *ptr, unsigned long size)
+co_os_realloc(void *ptr, uintptr_t size)
 {
 	return realloc(ptr, size);
 }

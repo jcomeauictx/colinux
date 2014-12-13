@@ -66,7 +66,7 @@ void co_os_free_pages(void *ptr, unsigned int pages)
 
 #define CO_OS_POOL_TAG (('c' << 0) | ('o' << 8) |  ('l' << 16) | ('x' << 24))
 
-void *co_os_malloc(unsigned long bytes)
+void *co_os_malloc(uintptr_t bytes)
 {
 	void *ret;
 
@@ -101,7 +101,7 @@ void co_os_free(void *ptr)
 co_rc_t co_os_userspace_map(void *address, unsigned int pages, void **user_address_out, void **handle_out)
 {
 	void *user_address;
-	unsigned long memory_size = ((unsigned long)pages) << CO_ARCH_PAGE_SHIFT;
+	uintptr_t memory_size = ((uintptr_t)pages) << CO_ARCH_PAGE_SHIFT;
 	PMDL mdl;
 
 	mdl = IoAllocateMdl(address, memory_size, FALSE, FALSE, NULL);

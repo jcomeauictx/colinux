@@ -128,9 +128,9 @@ tcp_respond(tp, ti, m, ack, seq, flags)
 	int win = 0;
 
 	DEBUG_CALL("tcp_respond");
-	DEBUG_ARG("tp = %lx", (long)tp);
-	DEBUG_ARG("ti = %lx", (long)ti);
-	DEBUG_ARG("m = %lx", (long)m);
+	DEBUG_ARG("tp = %x", (int)tp);
+	DEBUG_ARG("ti = %x", (int)ti);
+	DEBUG_ARG("m = %x", (int)m);
 	DEBUG_ARG("ack = %u", ack);
 	DEBUG_ARG("seq = %u", seq);
 	DEBUG_ARG("flags = %x", flags);
@@ -249,7 +249,7 @@ struct tcpcb *tcp_drop(struct tcpcb *tp, int err)
 */
 
 	DEBUG_CALL("tcp_drop");
-	DEBUG_ARG("tp = %lx", (long)tp);
+	DEBUG_ARG("tp = %x", (int)tp);
 	DEBUG_ARG("errno = %d", errno);
 
 	if (TCPS_HAVERCVDSYN(tp->t_state)) {
@@ -280,7 +280,7 @@ tcp_close(tp)
 	register struct mbuf *m;
 
 	DEBUG_CALL("tcp_close");
-	DEBUG_ARG("tp = %lx", (long )tp);
+	DEBUG_ARG("tp = %x", (int )tp);
 
 	/* free the reassembly queue, if any */
 	t = (struct tcpiphdr *) tp->seg_next;
@@ -355,7 +355,7 @@ tcp_sockclosed(tp)
 {
 
 	DEBUG_CALL("tcp_sockclosed");
-	DEBUG_ARG("tp = %lx", (long)tp);
+	DEBUG_ARG("tp = %x", (int)tp);
 
 	switch (tp->t_state) {
 
@@ -398,7 +398,7 @@ int tcp_fconnect(so)
   int ret=0;
 
   DEBUG_CALL("tcp_fconnect");
-  DEBUG_ARG("so = %lx", (long )so);
+  DEBUG_ARG("so = %x", (int )so);
 
   if( (ret=so->s=socket(AF_INET,SOCK_STREAM,0)) >= 0) {
     int opt, s=so->s;
@@ -465,7 +465,7 @@ tcp_connect(inso)
 	int s, opt;
 
 	DEBUG_CALL("tcp_connect");
-	DEBUG_ARG("inso = %lx", (long)inso);
+	DEBUG_ARG("inso = %x", (int)inso);
 
 	/*
 	 * If it's an SS_ACCEPTONCE socket, no need to socreate()
@@ -644,8 +644,8 @@ tcp_emu(so, m)
 	char *bptr;
 
 	DEBUG_CALL("tcp_emu");
-	DEBUG_ARG("so = %lx", (long)so);
-	DEBUG_ARG("m = %lx", (long)m);
+	DEBUG_ARG("so = %x", (int)so);
+	DEBUG_ARG("m = %x", (int)m);
 
 	switch(so->so_emu) {
 		int x, i;
@@ -1089,24 +1089,24 @@ do_prompt:
 				return 1;
 
 			m->m_len = bptr - m->m_data; /* Adjust length */
-			m->m_len += sprintf(bptr, "DCC CHAT chat %lu %u%c\n",
-			     (unsigned long)ntohl(so->so_faddr.s_addr),
+			m->m_len += sprintf(bptr, "DCC CHAT chat %u %u%c\n",
+			     (unsigned int)ntohl(so->so_faddr.s_addr),
 			     ntohs(so->so_fport), 1);
 		} else if (sscanf(bptr, "DCC SEND %256s %u %u %u", buff, &laddr, &lport, &n1) == 4) {
 			if ((so = solisten(0, htonl(laddr), htons(lport), SS_FACCEPTONCE)) == NULL)
 				return 1;
 
 			m->m_len = bptr - m->m_data; /* Adjust length */
-			m->m_len += sprintf(bptr, "DCC SEND %s %lu %u %u%c\n",
-			      buff, (unsigned long)ntohl(so->so_faddr.s_addr),
+			m->m_len += sprintf(bptr, "DCC SEND %s %u %u %u%c\n",
+			      buff, (unsigned int)ntohl(so->so_faddr.s_addr),
 			      ntohs(so->so_fport), n1, 1);
 		} else if (sscanf(bptr, "DCC MOVE %256s %u %u %u", buff, &laddr, &lport, &n1) == 4) {
 			if ((so = solisten(0, htonl(laddr), htons(lport), SS_FACCEPTONCE)) == NULL)
 				return 1;
 
 			m->m_len = bptr - m->m_data; /* Adjust length */
-			m->m_len += sprintf(bptr, "DCC MOVE %s %lu %u %u%c\n",
-			      buff, (unsigned long)ntohl(so->so_faddr.s_addr),
+			m->m_len += sprintf(bptr, "DCC MOVE %s %u %u %u%c\n",
+			      buff, (unsigned int)ntohl(so->so_faddr.s_addr),
 			      ntohs(so->so_fport), n1, 1);
 		}
 		return 1;
@@ -1260,7 +1260,7 @@ tcp_ctl(so)
         //	struct socket *tmpso;
 
 	DEBUG_CALL("tcp_ctl");
-	DEBUG_ARG("so = %lx", (long )so);
+	DEBUG_ARG("so = %x", (int )so);
 
 #if 0
 	/*

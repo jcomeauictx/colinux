@@ -39,7 +39,7 @@ extern co_rc_t co_user_monitor_load_section(co_user_monitor_t*		     umon,
 
 extern co_rc_t co_user_monitor_load_initrd(co_user_monitor_t*	umon,
 					   void*		initrd,
-					   unsigned long	initrd_size);
+					   uintptr_t	initrd_size);
 
 extern co_rc_t co_user_monitor_run(co_user_monitor_t* umon, co_monitor_ioctl_run_t* params);
 extern co_rc_t co_user_monitor_start(co_user_monitor_t* umon);

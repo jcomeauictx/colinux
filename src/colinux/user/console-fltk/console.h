@@ -104,7 +104,7 @@ protected:
 	void menu_item_deactivate(Fl_Callback *cb);
 	void global_resize_constraint();
 
-	static co_rc_t message_receive(co_reactor_user_t user, unsigned char *buffer, unsigned long size);
+	static co_rc_t message_receive(co_reactor_user_t user, unsigned char *buffer, uintptr_t size);
 
 	// registry settings
 	int reg_font, reg_font_size, reg_copyspaces, reg_exitdetach;

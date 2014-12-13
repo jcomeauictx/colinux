@@ -43,7 +43,7 @@ typedef co_rc_t (*co_monitor_transfer_func_t)(
 	struct co_monitor *cmon,
 	void *host_data,
 	void *linuxvm,
-	unsigned long size,
+	uintptr_t size,
 	co_monitor_transfer_dir_t dir
 	);
 
@@ -53,7 +53,7 @@ extern co_rc_t co_monitor_host_linuxvm_transfer(
 	void *host_data,
 	co_monitor_transfer_func_t host_func,
 	vm_ptr_t para,
-	unsigned long size,
+	uintptr_t size,
 	co_monitor_transfer_dir_t dir
 	);
 
@@ -64,7 +64,7 @@ extern co_rc_t co_monitor_host_linuxvm_transfer(
 co_rc_t co_monitor_host_linuxvm_transfer_map(
 	struct co_monitor *cmon,
 	vm_ptr_t vaddr,
-	unsigned long size,
+	uintptr_t size,
 	unsigned char **start,
 	unsigned char **page,
 	co_pfn_t *ppfn
@@ -84,9 +84,9 @@ static inline void co_monitor_host_linuxvm_transfer_unmap(
  */
 
 extern co_rc_t co_monitor_host_to_linuxvm(struct co_monitor *cmon, void *from,
-					  vm_ptr_t to, unsigned long size);
+					  vm_ptr_t to, uintptr_t size);
 extern co_rc_t co_monitor_linuxvm_to_host(struct co_monitor *cmon, vm_ptr_t from,
-					  void *to, unsigned long size);
+					  void *to, uintptr_t size);
 
 
 #endif

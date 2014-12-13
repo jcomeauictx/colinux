@@ -251,9 +251,9 @@ co_rc_t open_tap_win32(HANDLE *phandle, char *prefered_name)
 	BOOL bret;
 	char name_buffer[0x100] = {0, };
 	struct {
-		unsigned long major;
-		unsigned long minor;
-		unsigned long debug;
+		uintptr_t major;
+		uintptr_t minor;
+		uintptr_t debug;
 	} version;
 	DWORD version_len;
 
@@ -299,7 +299,7 @@ co_rc_t open_tap_win32(HANDLE *phandle, char *prefered_name)
 		return CO_RC(ERROR);
 	}
 
-	co_terminal_print("colinux-net-daemon: TAP driver version %ld.%ld\n", version.major, version.minor);
+	co_terminal_print("colinux-net-daemon: TAP driver version %d.%d\n", (int)version.major, (int)version.minor);
 
 	*phandle = handle;
 
@@ -309,7 +309,7 @@ co_rc_t open_tap_win32(HANDLE *phandle, char *prefered_name)
 
 BOOL tap_win32_set_status(HANDLE handle, BOOL status)
 {
-	unsigned long len = 0;
+	DWORD len = 0;
 
 	return DeviceIoControl(handle, TAP_IOCTL_SET_MEDIA_STATUS,
 				&status, sizeof (status),

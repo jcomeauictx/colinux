@@ -55,7 +55,6 @@ static NTSTATUS manager_read(co_manager_t *manager, co_manager_open_desc_t opene
 {
 	NTSTATUS ntStatus = STATUS_UNSUCCESSFUL;
 	co_rc_t rc;
-	char *buffer;
 	co_queue_t *queue;
 
 	DbgPrint("colinux: manager_read...\n");
@@ -66,8 +65,6 @@ static NTSTATUS manager_read(co_manager_t *manager, co_manager_open_desc_t opene
 		IoCompleteRequest(Irp, IO_NO_INCREMENT);
 		return ntStatus;
 	}
-
-	buffer = Irp->AssociatedIrp.SystemBuffer;
 
 	co_os_mutex_acquire(opened->lock);
 
@@ -85,7 +82,7 @@ static NTSTATUS manager_read(co_manager_t *manager, co_manager_open_desc_t opene
 				return rc;
 
 			co_message_t *message = message_item->message;
-			unsigned long size = message->size + sizeof(*message);
+			uintptr_t size = message->size + sizeof(*message);
 			if (io_buffer + size > io_buffer_end) {
 				break;
 			}
@@ -150,11 +147,11 @@ static NTSTATUS manager_write(co_manager_t *manager, co_manager_open_desc_t open
 
 	if (opened->monitor) {
 		char *buffer;
-		unsigned long size;
+		uintptr_t size;
 		co_message_t *message;
-		unsigned long message_size;
-		long size_left;
-		long position;
+		uintptr_t message_size;
+		intptr_t size_left;
+		intptr_t position;
 
 		buffer = Irp->AssociatedIrp.SystemBuffer;
 		size = Irp->IoStatus.Information;
@@ -306,7 +303,7 @@ driver_dispatch(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 		rc = co_manager_ioctl(manager, ioctl, ioBuffer,
 				 inputBufferLength,
 				 outputBufferLength,
-				 (unsigned long *)&Irp->IoStatus.Information, /* truncate max size to 32 bit here. */
+				 (uintptr_t *)&Irp->IoStatus.Information, /* truncate max size to 32 bit here. */
 				 opened);
 
 		/* Intrinsic Success / Failure indictation is returned per ioctl. */
@@ -364,7 +361,6 @@ DriverEntry(
 	const WCHAR deviceLinkBuffer[]  = L"\\DosDevices\\" CO_DRIVER_NAME;
 	UNICODE_STRING deviceLinkUnicodeString;
 	co_manager_t *manager;
-	co_rc_t rc;
 
 	DbgPrint("colinux: DriverEntry...\n");
 	// TODO: DEBUG: Runtime check struct offsets.
@@ -425,7 +421,7 @@ DriverEntry(
 	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = driver_dispatch;
 	DriverObject->DriverUnload                         = driver_unload;
 
-	rc = co_manager_load(manager);
+	co_manager_load(manager);
 
 	/* Needed for IoWorkItem */
 	coLinux_DeviceObject = deviceObject;

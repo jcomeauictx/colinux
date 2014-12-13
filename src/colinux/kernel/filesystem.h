@@ -66,14 +66,14 @@ typedef struct co_filesystem_ops {
 	co_rc_t (*getattr)(co_filesystem_t *fs, co_inode_t *dir, char *name, struct fuse_attr *attr);
 	co_rc_t (*getdir)(co_filesystem_t *fs, co_inode_t *dir, co_filesystem_dir_names_t *names);
 	co_rc_t (*inode_read_write)(struct co_monitor *linuxvm, co_filesystem_t *filesystem,
-				    co_inode_t *inode, unsigned long long offset, unsigned long size,
+				    co_inode_t *inode, unsigned long long offset, uintptr_t size,
 				    vm_ptr_t src_buffer, bool_t read);
-	co_rc_t (*inode_mknod)(co_filesystem_t *filesystem, co_inode_t *inode, unsigned long mode,
-			       unsigned long rdev, char *name, int *ino, struct fuse_attr *attr);
+	co_rc_t (*inode_mknod)(co_filesystem_t *filesystem, co_inode_t *inode, uintptr_t mode,
+			       uintptr_t rdev, char *name, int *ino, struct fuse_attr *attr);
 	co_rc_t (*inode_set_attr)(co_filesystem_t *filesystem, co_inode_t *inode,
-				  unsigned long valid, struct fuse_attr *attr);
+				  uintptr_t valid, struct fuse_attr *attr);
 	co_rc_t (*inode_mkdir)(co_filesystem_t *filesystem, co_inode_t *inode,
-			       unsigned long mode, char *name);
+			       uintptr_t mode, char *name);
 	co_rc_t (*inode_unlink)(co_filesystem_t *filesystem, co_inode_t *inode, char *name);
 	co_rc_t (*inode_rmdir)(co_filesystem_t *filesystem, co_inode_t *inode, char *name);
 	co_rc_t (*fs_stat)(co_filesystem_t *filesystem, struct fuse_statfs_out *statfs);
@@ -81,7 +81,7 @@ typedef struct co_filesystem_ops {
 
 struct co_monitor;
 extern void co_monitor_file_system(struct co_monitor *cmon, unsigned int unit,
-				   enum fuse_opcode opcode, unsigned long *params);
+				   enum fuse_opcode opcode, uintptr_t *params);
 
 extern void co_filesystem_getdir_free(co_filesystem_dir_names_t *names);
 
