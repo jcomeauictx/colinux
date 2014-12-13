@@ -15,7 +15,7 @@
 
 #include "ddk.h"
 
-unsigned long windows_time_to_unix_time(LARGE_INTEGER time);
-LARGE_INTEGER unix_time_to_windows_time(unsigned long time);
+uintptr_t windows_time_to_unix_time(LARGE_INTEGER time);
+LARGE_INTEGER unix_time_to_windows_time(uintptr_t time);
 
 #endif

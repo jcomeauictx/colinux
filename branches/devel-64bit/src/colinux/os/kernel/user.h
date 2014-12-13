@@ -17,7 +17,7 @@
  * Userspace access routines.
  */
 
-co_rc_t co_copy_to_user(char *user_address, char *kernel_address, unsigned long size);
-co_rc_t co_copy_from_user(char *user_address, char *kernel_address, unsigned long size);
+co_rc_t co_copy_to_user(char *user_address, char *kernel_address, uintptr_t size);
+co_rc_t co_copy_from_user(char *user_address, char *kernel_address, uintptr_t size);
 
 #endif

@@ -59,7 +59,7 @@ typedef enum {
 } co_rc_value_t;
 #undef X
 
-typedef long co_rc_t;
+typedef intptr_t co_rc_t;
 
 #include "debug.h"
 
@@ -127,7 +127,7 @@ typedef long co_rc_t;
 /*
  * Defines a LINUX instance. There are CO_MAX_COLINUXS of these
  */
-typedef unsigned int co_id_t;
+typedef uintptr_t co_id_t;
 
 #define CO_INVALID_ID ((co_id_t)-1)
 
@@ -143,9 +143,9 @@ typedef char co_pathname_t[0x100];
 
 #include <stdarg.h>
 
-extern int co_snprintf(char *str, long n, const char *format, ...)
+extern int co_snprintf(char *str, int n, const char *format, ...)
 	__attribute__ ((format (printf, 3, 4)));
-extern int co_vsnprintf(char *str, long nmax, const char *format, va_list ap)
+extern int co_vsnprintf(char *str, int nmax, const char *format, va_list ap)
 	__attribute__ ((format (printf, 3, 0)));
 extern void co_rc_format_error(co_rc_t rc, char *buf, int size);
 

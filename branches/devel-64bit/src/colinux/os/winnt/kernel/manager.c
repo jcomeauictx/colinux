@@ -54,13 +54,13 @@ co_rc_t co_os_manager_init(co_manager_t *manager, co_osdep_manager_t *osdep)
 
 void co_os_manager_free(co_osdep_manager_t osdep)
 {
-	co_debug("before free: %ld mdls, %ld pages", osdep->mdls_allocated, osdep->pages_allocated);
+	co_debug("before free: %I64d mdls, %I64d pages", (int64_t)osdep->mdls_allocated, (int64_t)osdep->pages_allocated);
 
 	co_winnt_free_all_pages(osdep);
 
 	co_os_mutex_destroy(osdep->mutex);
 
-	co_debug("after free: %ld mdls, %ld pages", osdep->mdls_allocated, osdep->pages_allocated);
+	co_debug("after free: %I64d mdls, %I64d pages", (int64_t)osdep->mdls_allocated, (int64_t)osdep->pages_allocated);
 
 	co_os_free(osdep);
 }
@@ -108,8 +108,8 @@ bool_t co_os_manager_userspace_try_send_direct(
 	if (Irp) {
 		KIRQL irql;
 		unsigned char *io_buffer;
-		unsigned long size = message->size + sizeof(*message);
-		unsigned long buffer_size = Irp->IoStatus.Information;
+		uintptr_t size = message->size + sizeof(*message);
+		uintptr_t buffer_size = Irp->IoStatus.Information;
 
 		IoAcquireCancelSpinLock(&irql);
 		fixme_IoSetCancelRoutine(Irp, NULL);

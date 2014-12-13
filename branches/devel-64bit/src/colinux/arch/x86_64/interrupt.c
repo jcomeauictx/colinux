@@ -28,15 +28,21 @@ static inline void call_intr(void *func)
 
 void co_monitor_arch_real_hardware_interrupt(co_monitor_t *cmon)
 {
-	struct {
-		unsigned long a, b;
-	} *host;
+	/* 16byte gate */
+	struct gate_struct64 {
+		uint16_t offset_low;
+		uint16_t segment;
+		uint16_t ist_zero0_type_dpl_p;
+		uint16_t offset_middle;
+		uint32_t offset_high;
+		uint32_t zero1;
+	} __attribute__((packed)) *host;
 	void *func;
 
 	host = (typeof(host))(cmon->passage_page->host_state.idt.table);
 	host = &host[co_passage_page->params[0]];
-	func = (void *)((host->b & 0xffff0000) | (host->a & 0x0000ffff));
-
+	func = (void *)(host->offset_low | ((uint64_t)host->offset_middle << 16) | ((uint64_t)host->offset_high << 32));
+	
 	call_intr(func);
 }
 

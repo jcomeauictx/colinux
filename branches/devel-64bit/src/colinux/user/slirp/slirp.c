@@ -126,7 +126,7 @@ static int get_dns_addr(struct in_addr *pdns_addr)
 /* Get DNS-Address from host, cached for 10 Seconds (SO_EXPIREFAST) */
 struct in_addr cached_dns_addr (void)
 {
-    static long dns_expire;
+    static int dns_expire;
 
     if (!dns_addr.s_addr || curtime > dns_expire) {
         if (get_dns_addr(&dns_addr) < 0) {

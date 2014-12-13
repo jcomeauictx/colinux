@@ -39,7 +39,7 @@ static void set_hostmem_usage_limit(co_manager_t* manager)
 		manager->hostmem_usage_limit = manager->hostmem_amount*3/4;
 	}
 
-	co_debug("machine RAM use limit: %ld MB" , manager->hostmem_usage_limit);
+	co_debug("machine RAM use limit: %I64d MB" , (int64_t)manager->hostmem_usage_limit);
 
 	manager->hostmem_usage_limit <<= 20; /* Megify */
 }
@@ -66,7 +66,7 @@ co_rc_t co_manager_load(co_manager_t *manager)
 
 	/* Calculate amount in mega bytes, not overruns the 4GB limit of unsigned long integer */
 	manager->hostmem_amount = manager->hostmem_pages >> (20-CO_ARCH_PAGE_SHIFT);
-	co_debug("machine has %ld MB of RAM", manager->hostmem_amount);
+	co_debug("machine has %I64d MB of RAM", (int64_t)manager->hostmem_amount);
 
 	if (manager->hostmem_pages > 0x100000) {
 		co_debug_error("error, machines with more than 4GB are not currently supported");
@@ -154,8 +154,8 @@ co_rc_t co_manager_send(co_manager_t*		manager,
 		rc = co_message_dup_to_queue(message, &opened->out_queue);
 
 		if (co_queue_size(&opened->out_queue) > CO_QUEUE_COUNT_LIMIT_BEFORE_SLEEP)
-			co_debug("queue %d exceed limit with items %ld",
-			         message->to, opened->out_queue.items_count);
+			co_debug("queue %d exceed limit with items %I64d",
+			         message->to, (int64_t)opened->out_queue.items_count);
 
 		while (co_queue_size(&opened->out_queue) > CO_QUEUE_COUNT_LIMIT_BEFORE_SLEEP
 		       && opened->active) {
@@ -302,11 +302,11 @@ co_rc_t co_manager_open_desc_deactive_and_close(co_manager_t*	       manager,
 }
 
 co_rc_t co_manager_ioctl(co_manager_t* 		manager,
-			 unsigned long 		ioctl,
+			 uintptr_t 		ioctl,
 			 void*			io_buffer,
-			 unsigned long		in_size,
-			 unsigned long		out_size,
-			 unsigned long*		return_size,
+			 uintptr_t		in_size,
+			 uintptr_t		out_size,
+			 uintptr_t*		return_size,
 			 co_manager_open_desc_t opened)
 {
 	co_rc_t       rc   = CO_RC_OK;
@@ -327,7 +327,7 @@ co_rc_t co_manager_ioctl(co_manager_t* 		manager,
 
 #ifdef WIN64
 		if (out_size != sizeof(*params)) {
-			co_debug("CO_MANAGER_IOCTL_STATUS illegal size 0x%lx <> 0x%x\n", out_size, (int)sizeof(*params));
+			co_debug("CO_MANAGER_IOCTL_STATUS illegal size 0x%I64x <> 0x%x\n", (int64_t)out_size, (int)sizeof(*params));
 			return CO_RC(INVALID_PARAMETER);
 		}
 #else
@@ -497,8 +497,8 @@ co_rc_t co_manager_ioctl(co_manager_t* 		manager,
 		*return_size = sizeof(*params);
 
 		if (in_size < sizeof(*params)) {
-			co_debug_error("monitor ioctl too small! (%ld < %u)",
-			               in_size, (int)sizeof(*params));
+			co_debug_error("monitor ioctl too small! (%I64d < %u)",
+			               (int64_t)in_size, (int)sizeof(*params));
 			params->rc = CO_RC(MONITOR_NOT_LOADED);
 			break;
 		}

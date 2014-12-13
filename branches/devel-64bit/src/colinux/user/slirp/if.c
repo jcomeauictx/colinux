@@ -109,7 +109,7 @@ if_input(ttyp)
 	int if_n;
 
 	DEBUG_CALL("if_input");
-	DEBUG_ARG("ttyp = %lx", (long)ttyp);
+	DEBUG_ARG("ttyp = %x", (int)ttyp);
 
 	if_n = recv(ttyp->fd, (char *)if_inbuff, INBUFF_SIZE,0);
 
@@ -165,8 +165,8 @@ if_output(so, ifm)
 	int on_fastq = 1;
 
 	DEBUG_CALL("if_output");
-	DEBUG_ARG("so = %lx", (long)so);
-	DEBUG_ARG("ifm = %lx", (long)ifm);
+	DEBUG_ARG("so = %x", (int)so);
+	DEBUG_ARG("ifm = %x", (int)ifm);
 
 	/*
 	 * First remove the mbuf from m_usedlist,

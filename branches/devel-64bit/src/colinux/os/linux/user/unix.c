@@ -39,7 +39,7 @@ bool_t co_os_get_blocking(int sock)
 	return PFALSE;
 }
 
-co_rc_t co_os_sendn(int sock, char *data, unsigned long size)
+co_rc_t co_os_sendn(int sock, char *data, uintptr_t size)
 {
 	co_rc_t rc = CO_RC(OK);
 	bool_t blocking;
@@ -68,7 +68,7 @@ co_rc_t co_os_sendn(int sock, char *data, unsigned long size)
 	return rc;
 }
 
-co_rc_t co_os_recv(int sock, char *data, unsigned long size, unsigned long *current_size)
+co_rc_t co_os_recv(int sock, char *data, uintptr_t size, uintptr_t *current_size)
 {
 	int received;
 	if (size == *current_size)

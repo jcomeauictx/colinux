@@ -77,7 +77,7 @@ int tap_alloc(char *dev)
 
 static user_network_tap_daemon_t *tap_daemon = 0;
 
-static co_rc_t tap_receive(co_reactor_user_t user, unsigned char *buffer, unsigned long size)
+static co_rc_t tap_receive(co_reactor_user_t user, unsigned char *buffer, uintptr_t size)
 {
 	tap_daemon->received_from_tap(buffer, size);
 	return CO_RC(OK);
@@ -111,7 +111,7 @@ void user_network_tap_daemon_t::prepare_for_loop()
 	}
 }
 
-void user_network_tap_daemon_t::received_from_tap(unsigned char *buffer, unsigned long size)
+void user_network_tap_daemon_t::received_from_tap(unsigned char *buffer, uintptr_t size)
 {
 	send_to_monitor_raw(CO_DEVICE_NETWORK, buffer, size);
 }

@@ -15,7 +15,7 @@
  * Obtains the GMT time_t from the host.
  */
 
-extern unsigned long co_os_get_time(void);
+extern uintptr_t co_os_get_time(void);
 
 #endif
 

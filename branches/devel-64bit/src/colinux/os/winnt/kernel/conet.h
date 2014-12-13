@@ -29,7 +29,7 @@ typedef struct _conet_adapter {
 	co_monitor_t	*monitor;		/* the monitor that opened this adapter */
 	int		conet_unit;		/* colinux conet unit id */
 	int		promisc;		/* true if works in promisc mode */
-	long		packet_filter;		/* NDIS packet filter */
+	intptr_t		packet_filter;		/* NDIS packet filter */
 	char		macaddr[6];		/* MAC address of conet adapter */
 	NDIS_HANDLE	binding_handle; 	/* ndis binding handle */
 	NDIS_STATUS	binding_status;		/* binding result status */

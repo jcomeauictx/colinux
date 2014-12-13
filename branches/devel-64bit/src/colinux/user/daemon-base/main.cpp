@@ -64,10 +64,10 @@ void user_daemon_t::handle_parameters(int argc, char *argv[])
 
 		verify_parameters();
 
-		if (param_index >= get_unit_count())
+		if ((unsigned int)param_index >= get_unit_count())
 		{
 			syntax();
-			log("invalid unit index: %d\n", param_index);
+			log("invalid unit index: %d\n", (int)param_index);
 			throw user_daemon_exception_t(rc);
 		}
 
@@ -94,12 +94,12 @@ void user_daemon_t::verify_parameters()
 
 static user_daemon_t *user_daemon = 0;
 
-co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, unsigned long size)
+co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, uintptr_t size)
 {
 	co_message_t *message;
-	unsigned long message_size;
-	long size_left = size;
-	long position = 0;
+	uintptr_t message_size;
+	intptr_t size_left = size;
+	intptr_t position = 0;
 
 	while (size_left > 0) {
 		message = (typeof(message))(&buffer[position]);
@@ -153,7 +153,7 @@ void user_daemon_t::send_to_monitor(co_message_t *message)
 					   message->size + sizeof(*message));
 }
 
-void user_daemon_t::send_to_monitor_raw(co_device_t device, unsigned char *buffer, unsigned long size)
+void user_daemon_t::send_to_monitor_raw(co_device_t device, unsigned char *buffer, uintptr_t size)
 {
 	struct {
 		co_message_t message;

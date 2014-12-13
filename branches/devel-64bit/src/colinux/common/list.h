@@ -65,7 +65,7 @@ static inline void co_list_del(co_list_t *entry)
  * @member:	the name of the co_list_t within the struct.
  */
 #define co_list_entry(ptr, type, member)				\
-	((type *)((char *)(ptr)-(unsigned long)(&((type *)0)->member)))
+	((type *)((char *)(ptr)-(uintptr_t)(&((type *)0)->member)))
 
 #define co_list_entry_assign(ptr, var, member)				\
 	var = co_list_entry(ptr, typeof(*var), member)

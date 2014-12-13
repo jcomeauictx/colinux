@@ -25,7 +25,7 @@ static inline void call_intr(void *func)
 void co_monitor_arch_real_hardware_interrupt(co_monitor_t *cmon)
 {
 	struct {
-		unsigned long a, b;
+		unsigned int a, b;
 	} *host;
 	void *func;
 

@@ -59,7 +59,7 @@ typedef struct co_console_cell {
 
 typedef struct co_console {
 	/* size of this struct */
-	unsigned long	size;
+	uintptr_t	size;
 
         /* User defined configuration */
 	co_console_config_t config;

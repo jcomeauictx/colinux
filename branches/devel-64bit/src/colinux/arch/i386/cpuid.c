@@ -49,7 +49,7 @@ bool_t co_i386_has_cpuid()
 	return has_cpuid;
 }
 
-void co_i386_get_cpuid(unsigned long op, cpuid_t *cpuid)
+void co_i386_get_cpuid(uintptr_t op, cpuid_t *cpuid)
 {
 	asm("cpuid"
 	    : "=a" (cpuid->eax),
@@ -59,10 +59,10 @@ void co_i386_get_cpuid(unsigned long op, cpuid_t *cpuid)
 	    : "0" (op));
 }
 
-co_rc_t co_i386_get_cpuid_capabilities(unsigned long *caps)
+co_rc_t co_i386_get_cpuid_capabilities(uintptr_t *caps)
 {
 	cpuid_t cpuid;
-	unsigned long highest_op;
+	uintptr_t highest_op;
 
 	co_i386_get_cpuid(0, &cpuid);
 	highest_op = cpuid.highest_op;

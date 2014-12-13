@@ -24,9 +24,9 @@ static const char *co_errors_strings[] = {
 void co_rc_format_error(co_rc_t rc, char *buf, int size)
 {
 	if (CO_OK(rc)) {
-		co_snprintf(buf, size, "success - line %ld, file id %ld",
-			 CO_RC_GET_LINE(rc),
-			 CO_RC_GET_FILE_ID(rc));
+		co_snprintf(buf, size, "success - line %I64d, file id %I64d",
+			 (int64_t)CO_RC_GET_LINE(rc),
+			 (int64_t)CO_RC_GET_FILE_ID(rc));
 	} else {
 		unsigned int code;
 		unsigned int file_id;
@@ -57,8 +57,8 @@ void co_rc_format_error(co_rc_t rc, char *buf, int size)
 		file_string = "<unknown file>";
 #endif
 
-		co_snprintf(buf, size, "error - %s, line %ld, file %s (%d)",
-			    code_string, CO_RC_GET_LINE(rc), file_string, file_id);
+		co_snprintf(buf, size, "error - %s, line %I64d, file %s (%d)",
+			    code_string, (int64_t)CO_RC_GET_LINE(rc), file_string, file_id);
 	}
 }
 

@@ -26,12 +26,14 @@ typedef char *caddr_t;
 # include <sys/timeb.h>
 # include <iphlpapi.h>
 
+#ifndef _WIN64
 # define EWOULDBLOCK WSAEWOULDBLOCK
 # define EINPROGRESS WSAEINPROGRESS
 # define ENOTCONN WSAENOTCONN
 # define EHOSTUNREACH WSAEHOSTUNREACH
 # define ENETUNREACH WSAENETUNREACH
 # define ECONNREFUSED WSAECONNREFUSED
+#endif
 #else
 # define ioctlsocket ioctl
 # define closesocket(s) close(s)
@@ -251,7 +253,7 @@ void if_start _P((struct ttys *));
 #endif
 
 #ifndef HAVE_GETHOSTID
- long gethostid _P((void));
+ int gethostid _P((void));
 #endif
 
 void lprint _P((const char *, ...));

@@ -1438,7 +1438,7 @@ Index: linux-2.6.33-source/arch/x86/include/asm/cooperative.h
 ===================================================================
 --- /dev/null
 +++ linux-2.6.33-source/arch/x86/include/asm/cooperative.h
-@@ -0,0 +1,205 @@
+@@ -0,0 +1,213 @@
 +/*
 + *  linux/include/asm/cooperative.h
 + *
@@ -1451,6 +1451,14 @@ Index: linux-2.6.33-source/arch/x86/include/asm/cooperative.h
 +
 +#ifndef __LINUX_ASM_COOPERATIVE_H__
 +#define __LINUX_ASM_COOPERATIVE_H__
++
++#ifdef _WIN64
++typedef unsigned __int64		co_ulong_t;
++typedef __int64		co_long_t;
++#else
++ typedef unsigned long		co_ulong_t;
++ typedef long		co_long_t;
++#endif
 +
 +typedef struct {
 +	unsigned short size;
@@ -1465,34 +1473,34 @@ Index: linux-2.6.33-source/arch/x86/include/asm/cooperative.h
 +typedef struct {
 +	unsigned char border2[0x4];
 +
-+	unsigned long cs;
++	co_ulong_t cs;
 +        #define CO_ARCH_STATE_STACK_CS "0x04"
 +
-+	unsigned long ds;
++	co_ulong_t ds;
 +        #define CO_ARCH_STATE_STACK_DS "0x08"
 +
-+	unsigned long es;
++	co_ulong_t es;
 +        #define CO_ARCH_STATE_STACK_ES "0x0C"
 +
-+	unsigned long cr3;
++	co_ulong_t cr3;
 +        #define CO_ARCH_STATE_STACK_CR3 "0x10"
 +
-+	unsigned long cr4;
++	co_ulong_t cr4;
 +        #define CO_ARCH_STATE_STACK_CR4 "0x14"
 +
-+	unsigned long cr2;
++	co_ulong_t cr2;
 +        #define CO_ARCH_STATE_STACK_CR2 "0x18"
 +
-+	unsigned long cr0;
++	co_ulong_t cr0;
 +        #define CO_ARCH_STATE_STACK_CR0 "0x1C"
 +
 +	x86_gdt_t gdt;
 +        #define CO_ARCH_STATE_STACK_GDT "0x20"
 +
-+	unsigned long fs;
++	co_ulong_t fs;
 +        #define CO_ARCH_STATE_STACK_FS  "0x26"
 +
-+	unsigned long gs;
++	co_ulong_t gs;
 +        #define CO_ARCH_STATE_STACK_GS  "0x2A"
 +
 +	unsigned short ldt;
@@ -1504,67 +1512,67 @@ Index: linux-2.6.33-source/arch/x86/include/asm/cooperative.h
 +	unsigned short tr;
 +        #define CO_ARCH_STATE_STACK_TR  "0x36"
 +
-+	unsigned long return_eip;
++	co_ulong_t return_eip;
 +        #define CO_ARCH_STATE_STACK_RETURN_EIP  "0x38"
 +
-+	unsigned long flags;
++	co_ulong_t flags;
 +        #define CO_ARCH_STATE_STACK_FLAGS "0x3C"
 +
-+	unsigned long esp;
++	co_ulong_t esp;
 +        #define CO_ARCH_STATE_STACK_ESP "0x40"
 +
-+	unsigned long ss;
++	co_ulong_t ss;
 +        #define CO_ARCH_STATE_STACK_SS "0x44"
 +
-+	unsigned long dr0;
++	co_ulong_t dr0;
 +        #define CO_ARCH_STATE_STACK_DR0 "0x48"
 +
-+	unsigned long dr1;
++	co_ulong_t dr1;
 +        #define CO_ARCH_STATE_STACK_DR1 "0x4C"
 +
-+	unsigned long dr2;
++	co_ulong_t dr2;
 +        #define CO_ARCH_STATE_STACK_DR2 "0x50"
 +
-+	unsigned long dr3;
++	co_ulong_t dr3;
 +        #define CO_ARCH_STATE_STACK_DR3 "0x54"
 +
-+	unsigned long dr6;
++	co_ulong_t dr6;
 +        #define CO_ARCH_STATE_STACK_DR6 "0x58"
 +
-+	unsigned long dr7;
++	co_ulong_t dr7;
 +        #define CO_ARCH_STATE_STACK_DR7 "0x5C"
 +
 +	union {
-+		unsigned long temp_cr3;
-+		unsigned long other_map;
++		co_ulong_t temp_cr3;
++		co_ulong_t other_map;
 +	} __attribute__((packed));
 +        #define CO_ARCH_STATE_STACK_TEMP_CR3 "0x60"
 +        #define CO_ARCH_STATE_STACK_OTHERMAP "0x60"
 +
-+	unsigned long relocate_eip;
++	co_ulong_t relocate_eip;
 +        #define CO_ARCH_STATE_STACK_RELOCATE_EIP "0x64"
 +
-+	unsigned long pad1;
++	co_ulong_t pad1;
 +        #define CO_ARCH_STATE_STACK_RELOCATE_EIP_AFTER "0x68"
 +
-+	unsigned long va;
++	co_ulong_t va;
 +        #define CO_ARCH_STATE_STACK_VA "0x6C"
 +
-+	unsigned long sysenter_cs;
++	co_ulong_t sysenter_cs;
 +        #define CO_ARCH_STATE_SYSENTER_CS "0x70"
 +
-+	unsigned long sysenter_esp;
++	co_ulong_t sysenter_esp;
 +        #define CO_ARCH_STATE_SYSENTER_ESP "0x74"
 +
-+	unsigned long sysenter_eip;
++	co_ulong_t sysenter_eip;
 +        #define CO_ARCH_STATE_SYSENTER_EIP "0x78"
 +} __attribute__((packed)) co_arch_state_stack_t;
 +
 +#define CO_MAX_PARAM_SIZE 0x400
 +
 +typedef struct co_arch_passage_page_normal_address_space {
-+	unsigned long pgd[0x400];
-+	unsigned long pte[2][0x400];
++	co_ulong_t pgd[0x400];
++	co_ulong_t pte[2][0x400];
 +} co_arch_passage_page_normal_address_space_t;
 +
 +typedef struct co_arch_passage_page_pae_address_space {
@@ -1579,15 +1587,15 @@ Index: linux-2.6.33-source/arch/x86/include/asm/cooperative.h
 +			union {
 +				struct {
 +					union {
-+						unsigned long self_physical_address;
-+						unsigned long temp_pgd_physical;
++						co_ulong_t self_physical_address;
++						co_ulong_t temp_pgd_physical;
 +					} __attribute__((packed));
-+					unsigned long dr0;
-+					unsigned long dr1;
-+					unsigned long dr2;
-+					unsigned long dr3;
-+					unsigned long dr6;
-+					unsigned long dr7;
++					co_ulong_t dr0;
++					co_ulong_t dr1;
++					co_ulong_t dr2;
++					co_ulong_t dr3;
++					co_ulong_t dr6;
++					co_ulong_t dr7;
 +					unsigned char code[0x260];
 +				} __attribute__((packed));
 +				unsigned char pad[0x280]; /* Be careful! see NOTE below */
@@ -1604,8 +1612,8 @@ Index: linux-2.6.33-source/arch/x86/include/asm/cooperative.h
 +			co_arch_state_stack_t linuxvm_state;
 +
 +			/* Control parameters */
-+			unsigned long operation;
-+			unsigned long params[];
++			co_ulong_t operation;
++			co_ulong_t params[];
 +		} __attribute__((packed));
 +		unsigned char first_page[0x1000];
 +	};
@@ -1639,8 +1647,8 @@ Index: linux-2.6.33-source/arch/x86/include/asm/cooperative.h
 +#define CO_LOWMEMORY_MAX_MB 984
 +
 +typedef struct {
-+	unsigned long kernel_cs;
-+	unsigned long kernel_ds;
++	co_ulong_t kernel_cs;
++	co_ulong_t kernel_ds;
 +} __attribute__((packed)) co_arch_info_t;
 +
 +#endif
@@ -2002,7 +2010,7 @@ Index: linux-2.6.33-source/include/linux/cooperative.h
 +	co_module_t to;
 +	co_priority_t priority;
 +	co_message_type_t type;
-+	unsigned long size;
++	co_ulong_t size;
 +	unsigned char data[0];
 +} __attribute__((packed)) co_message_t;
 +
@@ -2056,13 +2064,13 @@ Index: linux-2.6.33-source/include/linux/cooperative.h
 +} __attribute__((packed)) co_linux_message_power_t;
 +
 +typedef struct {
-+	unsigned long tick_count;
++	co_ulong_t tick_count;
 +} __attribute__((packed)) co_linux_message_idle_t;
 +
 +typedef struct {
 +	co_device_t device;
 +	unsigned int unit;
-+	unsigned long size;
++	co_ulong_t size;
 +	char data[];
 +} __attribute__((packed)) co_linux_message_t;
 +
@@ -2200,15 +2208,15 @@ Index: linux-2.6.33-source/include/linux/cooperative.h
 +} __attribute__((packed)) co_console_message_t;
 +
 +typedef struct {
-+	unsigned long messages_waiting;
++	co_ulong_t messages_waiting;
 +	unsigned char buffer[];
 +} co_io_buffer_t;
 +
 +typedef struct {
-+	unsigned long index;
-+	unsigned long flags;
-+	unsigned long func;
-+	unsigned long pid;
++	co_ulong_t index;
++	co_ulong_t flags;
++	co_ulong_t func;
++	co_ulong_t pid;
 +} __attribute__((packed)) co_trace_point_info_t;
 +
 +typedef enum {
@@ -2236,12 +2244,12 @@ Index: linux-2.6.33-source/include/linux/cooperative.h
 +typedef void *vm_ptr_t;
 +#  else
 +/* But inside the host, the type is considered not to be a pointer in its own address space */
-+typedef unsigned long vm_ptr_t;
++typedef co_ulong_t vm_ptr_t;
 +# endif
 +
 +typedef struct {
 +	co_block_request_type_t type;
-+	long rc;
++	co_long_t rc;
 +	union {
 +		struct {
 +			unsigned long long offset;
@@ -2273,19 +2281,19 @@ Index: linux-2.6.33-source/include/linux/cooperative.h
 +#endif /* CO_KERNEL */
 +
 +typedef struct {
-+	unsigned long api_version;
-+	unsigned long compiler_major;
-+	unsigned long compiler_minor;
-+	unsigned long compiler_abi;
++	co_ulong_t api_version;
++	co_ulong_t compiler_major;
++	co_ulong_t compiler_minor;
++	co_ulong_t compiler_abi;
 +} __attribute__((packed)) co_info_t;
 +
 +typedef struct {
-+	unsigned long co_core_end;
-+	unsigned long co_memory_size;
++	co_ulong_t co_core_end;
++	co_ulong_t co_memory_size;
 +	void *co_initrd;
-+	unsigned long co_initrd_size;
-+	unsigned long co_cpu_khz;
-+	unsigned long filler[5];		// compatible old api: empty 5,6,7,8,9
++	co_ulong_t co_initrd_size;
++	co_ulong_t co_cpu_khz;
++	co_ulong_t filler[5];		// compatible old api: empty 5,6,7,8,9
 +	char co_boot_parameters[CO_BOOTPARAM_STRING_LENGTH]; // params[10]
 +} __attribute__((packed)) co_boot_params_t;
 +
@@ -2333,7 +2341,7 @@ Index: linux-2.6.33-source/include/linux/cooperative_internal.h
 +
 +#ifdef CONFIG_COLINUX_STATS
 +typedef struct co_proc_counts {
-+	unsigned long switches[CO_OPERATION_MAX];
++	co_ulong_t switches[CO_OPERATION_MAX];
 +} co_proc_counts_t;
 +
 +extern co_proc_counts_t co_proc_counts;

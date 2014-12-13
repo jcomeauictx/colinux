@@ -1,0 +1,16 @@
+--- linux-2.6.33.7-source/scripts/mkmakefile	2010-08-02 19:27:18.000000000 +0200
++++ linux-2.6.33.7-source/scripts/mkmakefile	2011-04-09 13:20:22.000000000 +0200
+@@ -44,7 +44,12 @@
+ 
+ Makefile:;
+ 
+-\$(all) %/: all
++ifneq (\$(all),)
++\$(all): all
++	@:
++endif
++
++%/: all
+ 	@:
+ 
+ EOF

@@ -68,20 +68,19 @@ co_reactor_t g_reactor = NULL;
 co_user_monitor_t *g_monitor_handle = NULL;
 start_parameters_t *daemon_parameters;
 
-static co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, unsigned long size)
+static co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, uintptr_t size)
 {
 	co_message_t *message;
-	unsigned long message_size;
-	long size_left = size;
-	long position = 0;
-	int pcap_rc;
+	uintptr_t message_size;
+	intptr_t size_left = size;
+	intptr_t position = 0;
 
 	while (size_left > 0) {
 		message = (typeof(message))(&buffer[position]);
 		message_size = message->size + sizeof(*message);
 		size_left -= message_size;
 		if (size_left >= 0) {
-			pcap_rc = pcap_sendpacket(pcap_packet.adhandle,
+			pcap_sendpacket(pcap_packet.adhandle,
 						  message->data, message->size);
 			/* TODO */
 		}

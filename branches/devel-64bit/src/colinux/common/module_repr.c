@@ -11,7 +11,7 @@
 
 char *co_module_repr(co_module_t module, co_module_name_t *str)
 {
-	switch (module) {
+	switch ((int)module) {
 	case CO_MODULE_LINUX: co_snprintf((char *)str, sizeof(*str), "linux"); break;
 	case CO_MODULE_MONITOR: co_snprintf((char *)str, sizeof(*str), "monitor"); break;
 	case CO_MODULE_DAEMON: co_snprintf((char *)str, sizeof(*str), "daemon"); break;

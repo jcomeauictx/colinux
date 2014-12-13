@@ -303,9 +303,9 @@ fork_exec(so, ex, do_pty)
 	int c, i, ret;
 
 	DEBUG_CALL("fork_exec");
-	DEBUG_ARG("so = %lx", (long)so);
-	DEBUG_ARG("ex = %lx", (long)ex);
-	DEBUG_ARG("do_pty = %lx", (long)do_pty);
+	DEBUG_ARG("so = %x", (int)so);
+	DEBUG_ARG("ex = %x", (int)ex);
+	DEBUG_ARG("do_pty = %x", (int)do_pty);
 
 	if (do_pty == 2) {
 		if (slirp_openpty(&master, &s) == -1) {
@@ -803,7 +803,7 @@ fd_nonblock(fd)
 	int fd;
 {
 #ifdef FIONBIO
-	unsigned long opt = 1;
+	u_long opt = 1;
 
 	ioctlsocket(fd, FIONBIO, &opt);
 #else
@@ -820,7 +820,7 @@ fd_block(fd)
 	int fd;
 {
 #ifdef FIONBIO
-	unsigned long opt = 0;
+	u_long opt = 0;
 
 	ioctlsocket(fd, FIONBIO, &opt);
 #else
@@ -851,7 +851,7 @@ rsh_exec(so,ns, user, host, args)
 	char buff[256];
 
 	DEBUG_CALL("rsh_exec");
-	DEBUG_ARG("so = %lx", (long)so);
+	DEBUG_ARG("so = %x", (int)so);
 
 	if (pipe(fd)<0) {
           lprint("Error: pipe failed: %s\n", strerror(errno));

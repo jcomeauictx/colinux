@@ -46,8 +46,7 @@ co_rc_t co_os_mutex_create(co_os_mutex_t *mutex_out)
 
 void co_os_mutex_acquire(co_os_mutex_t mutex)
 {
-	NTSTATUS status;
-	status = KeWaitForMutexObject(&mutex->mutex, UserRequest,
+	KeWaitForMutexObject(&mutex->mutex, UserRequest,
 				      KernelMode, FALSE, NULL);
 
 }

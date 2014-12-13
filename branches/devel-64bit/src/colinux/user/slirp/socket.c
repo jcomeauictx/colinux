@@ -100,7 +100,7 @@ soread(so)
 	int mss = so->so_tcpcb->t_maxseg;
 
 	DEBUG_CALL("soread");
-	DEBUG_ARG("so = %lx", (long )so);
+	DEBUG_ARG("so = %x", (int )so);
 
 	/*
 	 * No need to check if there's enough room to read.
@@ -209,7 +209,7 @@ sorecvoob(so)
 	struct tcpcb *tp = sototcpcb(so);
 
 	DEBUG_CALL("sorecvoob");
-	DEBUG_ARG("so = %lx", (long)so);
+	DEBUG_ARG("so = %x", (int)so);
 
 	/*
 	 * We take a guess at how much urgent data has arrived.
@@ -240,7 +240,7 @@ sosendoob(so)
 	int n, len;
 
 	DEBUG_CALL("sosendoob");
-	DEBUG_ARG("so = %lx", (long)so);
+	DEBUG_ARG("so = %x", (int)so);
 	DEBUG_ARG("sb->sb_cc = %d", sb->sb_cc);
 
 	if (so->so_urgc > 2048)
@@ -299,7 +299,7 @@ sowrite(so)
 	struct iovec iov[2] = { {0}, };
 
 	DEBUG_CALL("sowrite");
-	DEBUG_ARG("so = %lx", (long)so);
+	DEBUG_ARG("so = %x", (int)so);
 
 	if (so->so_urgc) {
 		sosendoob(so);
@@ -390,7 +390,7 @@ sorecvfrom(so)
 	socklen_t addrlen = sizeof(struct sockaddr_in);
 
 	DEBUG_CALL("sorecvfrom");
-	DEBUG_ARG("so = %lx", (long)so);
+	DEBUG_ARG("so = %x", (int)so);
 
 	if (so->so_type == IPPROTO_ICMP) {   /* This is a "ping" reply */
 	  char buff[256];
@@ -430,7 +430,7 @@ sorecvfrom(so)
 	} else {                            	/* A "normal" UDP packet */
 	  struct mbuf *m;
 	  int len;
-	  unsigned long n;
+	  u_long n;
 
 	  if (!(m = m_get())) return;
 	  m->m_data += if_maxlinkhdr;
@@ -504,8 +504,8 @@ sosendto(so, m)
 	struct sockaddr_in addr;
 
 	DEBUG_CALL("sosendto");
-	DEBUG_ARG("so = %lx", (long)so);
-	DEBUG_ARG("m = %lx", (long)m);
+	DEBUG_ARG("so = %x", (int)so);
+	DEBUG_ARG("m = %x", (int)m);
 
         addr.sin_family = AF_INET;
 	if ((so->so_faddr.s_addr & htonl(0xffffff00)) == special_addr.s_addr) {

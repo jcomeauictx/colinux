@@ -23,7 +23,7 @@
 co_rc_t read_pid_from_file(co_pathname_t pathname, co_id_t *id)
 {
 	char *buf;
-	unsigned long size;
+	uintptr_t size;
 	co_rc_t rc;
 
 	co_remove_quotation_marks(pathname);

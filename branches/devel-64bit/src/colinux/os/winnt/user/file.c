@@ -15,11 +15,11 @@
 
 #include "misc.h"
 
-co_rc_t co_os_file_load(co_pathname_t pathname, char **out_buf, unsigned long *out_size, unsigned long max_size)
+co_rc_t co_os_file_load(co_pathname_t pathname, char **out_buf, uintptr_t *out_size, uintptr_t max_size)
 {
 	HANDLE handle;
 	BOOL ret;
-	unsigned long size, size_read, high;
+	DWORD size, size_read, high;
 	co_rc_t rc = CO_RC_OK;
 	char *buf;
 
@@ -51,7 +51,7 @@ co_rc_t co_os_file_load(co_pathname_t pathname, char **out_buf, unsigned long *o
 
 	ret = ReadFile(handle, buf, size, &size_read, NULL);
 
-	if (size != size_read) {
+	if (!ret || (size != size_read)) {
 		co_terminal_print_last_error(pathname);
 		co_debug_error("Error reading file %s, %lu != %lu",
 				pathname, size, size_read);

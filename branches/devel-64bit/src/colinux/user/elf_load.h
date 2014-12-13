@@ -18,10 +18,10 @@ typedef	struct co_elf_symbol co_elf_symbol_t;
 
 struct co_daemon;
 
-extern co_rc_t co_elf_image_read(co_elf_data_t **pl, void *elf_buf, unsigned long size);
+extern co_rc_t co_elf_image_read(co_elf_data_t **pl, void *elf_buf, uintptr_t size);
 extern co_rc_t co_elf_image_load(struct co_daemon *daemon);
 extern co_elf_symbol_t *co_get_symbol_by_name(co_elf_data_t *pl, const char *name);
 extern void *co_elf_get_symbol_data(co_elf_data_t *pl, co_elf_symbol_t *symbol);
-extern unsigned long co_elf_get_symbol_value(co_elf_symbol_t *symbol);
+extern uintptr_t co_elf_get_symbol_value(co_elf_symbol_t *symbol);
 
 #endif

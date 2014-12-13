@@ -47,7 +47,7 @@ co_user_monitor_t *g_monitor_handle = NULL;
 start_parameters_t *daemon_parameters;
 char netcfg_id[256];
 
-static co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, unsigned long size)
+static co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, uintptr_t size)
 {
 	return CO_RC(OK);
 }

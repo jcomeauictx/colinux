@@ -23,8 +23,8 @@ typedef struct co_reactor_user *co_reactor_user_t;
 
 typedef struct co_reactor *co_reactor_t;
 
-typedef co_rc_t (*co_reactor_user_receive_func_t)(co_reactor_user_t user, unsigned char *buffer, unsigned long size);
-typedef co_rc_t (*co_reactor_user_send_func_t)(co_reactor_user_t user, unsigned char *buffer, unsigned long size);
+typedef co_rc_t (*co_reactor_user_receive_func_t)(co_reactor_user_t user, unsigned char *buffer, uintptr_t size);
+typedef co_rc_t (*co_reactor_user_send_func_t)(co_reactor_user_t user, unsigned char *buffer, uintptr_t size);
 
 struct co_reactor_user {
 	co_list_t node;
@@ -39,7 +39,7 @@ struct co_reactor_user {
 
 struct co_reactor {
 	co_list_t users;
-	unsigned long num_users;
+	uintptr_t num_users;
 };
 
 extern co_rc_t co_reactor_create(co_reactor_t *out_handle);

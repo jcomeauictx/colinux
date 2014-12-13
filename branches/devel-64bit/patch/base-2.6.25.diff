@@ -1305,8 +1305,8 @@ Index: linux-2.6.25-source/include/asm-x86/cooperative.h
 +			union {
 +				struct {
 +					union {
-+						unsigned long self_physical_address;
-+						unsigned long temp_pgd_physical;
++						uintptr_t self_physical_address;
++						uintptr_t temp_pgd_physical;
 +					} __attribute__((packed));
 +					unsigned long dr0;
 +					unsigned long dr1;
@@ -1331,7 +1331,7 @@ Index: linux-2.6.25-source/include/asm-x86/cooperative.h
 +
 +			/* Control parameters */
 +			unsigned long operation;
-+			unsigned long params[];
++			uintptr_t params[];
 +		} __attribute__((packed));
 +		unsigned char first_page[0x1000];
 +	};
@@ -1962,7 +1962,7 @@ Index: linux-2.6.25-source/include/linux/cooperative.h
 +typedef void *vm_ptr_t;
 +#  else
 +/* But inside the host, the type is considered not to be a pointer in its own address space */
-+typedef unsigned long vm_ptr_t;
++typedef uintptr_t vm_ptr_t;
 +# endif
 +
 +typedef struct {

@@ -1,0 +1,11 @@
+--- gcc445/x86_64-w64-mingw32/include/ddk/ndis.h.orig	2014-01-21 20:13:06.000000000 +0100
++++ gcc445/x86_64-w64-mingw32/include/ddk/ndis.h	2014-11-29 22:58:30.073085000 +0100
+@@ -4416,7 +4416,7 @@
+ VOID
+ NTAPI
+ NdisMWanIndicateReceiveComplete(
+-	IN NDIS_HANDLE  MiniportAdapterHandle
++	IN NDIS_HANDLE  MiniportAdapterHandle,
+ 	IN NDIS_HANDLE  NdisLinkContext);
+ 
+ NDISAPI

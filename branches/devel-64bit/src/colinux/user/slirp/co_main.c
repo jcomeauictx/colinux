@@ -32,7 +32,7 @@
 
 typedef struct start_parameters {
 	bool_t show_help;
-	unsigned int index;
+	uintptr_t index;
 	co_id_t instance;
 } start_parameters_t;
 
@@ -46,12 +46,12 @@ static co_user_monitor_t *g_monitor_handle;
 /* from slirp.c */
 extern struct in_addr client_addr;
 
-static co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, unsigned long size)
+static co_rc_t monitor_receive(co_reactor_user_t user, unsigned char *buffer, uintptr_t size)
 {
 	co_message_t *message;
-	unsigned long message_size;
-	long size_left = size;
-	long position = 0;
+	uintptr_t message_size;
+	int size_left = size;
+	int position = 0;
 
 	while (size_left > 0) {
 		message = (typeof(message))(&buffer[position]);
@@ -242,7 +242,7 @@ co_slirp_parse_args(co_command_line_params_t cmdline, start_parameters_t *parame
 	if ((parameters->index < 0) ||
 	    (parameters->index >= CO_MODULE_MAX_CONET))
 	{
-		co_terminal_print("conet-slirp-daemon: invalid index: %d\n", parameters->index);
+		co_terminal_print("conet-slirp-daemon: invalid index: %d\n", (int)parameters->index);
 		return CO_RC(ERROR);
 	}
 

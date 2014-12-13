@@ -2253,7 +2253,7 @@ Index: linux-2.6.25-source/include/linux/cooperative_fs.h
 ===================================================================
 --- /dev/null
 +++ linux-2.6.25-source/include/linux/cooperative_fs.h
-@@ -0,0 +1,273 @@
+@@ -0,0 +1,281 @@
 +/*
 +    FUSE: Filesystem in Userspace
 +    Copyright (C) 2001-2004  Miklos Szeredi <miklos@szeredi.hu>
@@ -2263,6 +2263,14 @@ Index: linux-2.6.25-source/include/linux/cooperative_fs.h
 +*/
 +
 +/* This file defines the kernel interface of FUSE */
++
++#ifdef _WIN64
++typedef unsigned __int64		cofs_ulong_t;
++typedef __int64				cofs_long_t;
++#else
++ typedef unsigned long		cofs_ulong_t;
++ typedef long				cofs_long_t;
++#endif
 +
 +#pragma pack(0)
 +
@@ -2321,20 +2329,20 @@ Index: linux-2.6.25-source/include/linux/cooperative_fs.h
 +	unsigned int        uid;
 +	unsigned int        gid;
 +	unsigned int        rdev;
-+	unsigned long       _dummy;
-+	unsigned long       blocks;
-+	unsigned long       atime;
-+	unsigned long       mtime;
-+	unsigned long       ctime;
++	cofs_ulong_t           _dummy;
++	cofs_ulong_t           blocks;
++	cofs_ulong_t           atime;
++	cofs_ulong_t           mtime;
++	cofs_ulong_t           ctime;
 +};
 +
 +struct fuse_kstatfs {
-+    long block_size;
-+    long blocks;
-+    long blocks_free;
-+    long files;
-+    long files_free;
-+    long namelen;
++    cofs_long_t block_size;
++    cofs_long_t blocks;
++    cofs_long_t blocks_free;
++    cofs_long_t files;
++    cofs_long_t files_free;
++    cofs_long_t namelen;
 +};
 +
 +#define FATTR_MODE	(1 << 0)
@@ -2382,7 +2390,7 @@ Index: linux-2.6.25-source/include/linux/cooperative_fs.h
 +
 +struct fuse_lookup_out {
 +	struct fuse_attr attr;
-+	unsigned long ino;
++	cofs_ulong_t ino;
 +};
 +
 +struct fuse_forget_in {
@@ -2406,7 +2414,7 @@ Index: linux-2.6.25-source/include/linux/cooperative_fs.h
 +
 +struct fuse_mknod_out {
 +	struct fuse_attr attr;
-+	unsigned long ino;
++	cofs_ulong_t ino;
 +};
 +
 +struct fuse_mkdir_in {
@@ -2414,11 +2422,11 @@ Index: linux-2.6.25-source/include/linux/cooperative_fs.h
 +};
 +
 +struct fuse_rename_in {
-+	unsigned long newdir;
++	cofs_ulong_t newdir;
 +};
 +
 +struct fuse_link_in {
-+	unsigned long newdir;
++	cofs_ulong_t newdir;
 +};
 +
 +struct fuse_setattr_in {
@@ -2455,7 +2463,7 @@ Index: linux-2.6.25-source/include/linux/cooperative_fs.h
 +struct fuse_in_header {
 +	int unique;
 +	enum fuse_opcode opcode;
-+	unsigned long ino;
++	cofs_ulong_t ino;
 +	unsigned int uid;
 +	unsigned int gid;
 +};
@@ -2468,11 +2476,11 @@ Index: linux-2.6.25-source/include/linux/cooperative_fs.h
 +struct fuse_user_header {
 +	int unique; /* zero */
 +	enum fuse_opcode opcode;
-+	unsigned long ino;
++	cofs_ulong_t ino;
 +};
 +
 +struct fuse_dirent {
-+	unsigned long ino;
++	cofs_ulong_t ino;
 +	unsigned short namelen;
 +	unsigned char type;
 +	char name[256];
@@ -2515,8 +2523,8 @@ Index: linux-2.6.25-source/include/linux/cooperative_fs.h
 +#define FUSE_DT_SOCK		12
 +#define FUSE_DT_WHT		14
 +
-+#define FUSE_NAME_OFFSET ((unsigned int) ((struct fuse_dirent *) 0)->name)
-+#define FUSE_DIRENT_ALIGN(x) (((x) + sizeof(long) - 1) & ~(sizeof(long) - 1))
++#define FUSE_NAME_OFFSET ((unsigned int)(cofs_ulong_t) ((struct fuse_dirent *) 0)->name)
++#define FUSE_DIRENT_ALIGN(x) (((x) + sizeof(cofs_long_t) - 1) & ~(sizeof(cofs_long_t) - 1))
 +#define FUSE_DIRENT_SIZE(d) \
 +	FUSE_DIRENT_ALIGN(FUSE_NAME_OFFSET + (d)->namelen)
 +#pragma pack()

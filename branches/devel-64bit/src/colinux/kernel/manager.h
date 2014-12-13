@@ -53,15 +53,15 @@ typedef struct co_manager_open_desc {
 typedef struct co_manager {
 	co_manager_state_t state;
 
-	unsigned long hostmem_amount;
-	unsigned long hostmem_used;
-	unsigned long hostmem_usage_limit;
-	unsigned long hostmem_pages;
+	uintptr_t hostmem_amount;
+	uintptr_t hostmem_used;
+	uintptr_t hostmem_usage_limit;
+	uintptr_t hostmem_pages;
 
 	co_pfn_t *reversed_map_pfns;
-	unsigned long reversed_page_count;
-	unsigned long *reversed_map_pgds;
-	unsigned long reversed_map_pgds_count;
+	uintptr_t reversed_page_count;
+	uintptr_t *reversed_map_pgds;
+	uintptr_t reversed_map_pgds_count;
 
 	co_osdep_manager_t osdep;
 	co_archdep_manager_t archdep;
@@ -69,10 +69,10 @@ typedef struct co_manager {
 	co_manager_debug_t debug;
 
 	co_list_t monitors;
-	unsigned long monitors_count;
+	uintptr_t monitors_count;
 
 	co_list_t opens;
-	unsigned long num_opens;
+	uintptr_t num_opens;
 	co_os_mutex_t lock;
 } co_manager_t;
 
@@ -80,9 +80,9 @@ extern co_manager_t *co_global_manager;
 
 extern co_rc_t co_manager_load(co_manager_t *manager);
 
-extern co_rc_t co_manager_ioctl(co_manager_t *manager, unsigned long ioctl,
-				void *io_buffer, unsigned long in_size,
-				unsigned long out_size, unsigned long *return_size,
+extern co_rc_t co_manager_ioctl(co_manager_t *manager, uintptr_t ioctl,
+				void *io_buffer, uintptr_t in_size,
+				uintptr_t out_size, uintptr_t *return_size,
 				co_manager_open_desc_t opened);
 
 extern co_rc_t co_manager_send_eof(co_manager_t *manager, co_manager_open_desc_t opened);

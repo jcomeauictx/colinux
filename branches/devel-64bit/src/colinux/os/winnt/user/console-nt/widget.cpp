@@ -24,6 +24,7 @@
 extern "C" {
 #include <colinux/os/alloc.h>
 
+#ifndef _WIN64
 // Not found in w32api/mingw
 extern PASCAL BOOL GetCurrentConsoleFont(HANDLE             hConsoleOutput,
                                          BOOL               bMaximumWindow,
@@ -31,6 +32,7 @@ extern PASCAL BOOL GetCurrentConsoleFont(HANDLE             hConsoleOutput,
 
 extern PASCAL COORD GetConsoleFontSize(HANDLE hConsoleOutput,
                                        DWORD  nFont);
+#endif
 }
 
 static BOOL ctrl_exit;

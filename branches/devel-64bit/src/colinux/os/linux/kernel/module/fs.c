@@ -21,14 +21,14 @@ co_rc_t co_os_fs_dir_inode_to_path(co_filesystem_t *fs, co_inode_t *dir,
 }
 
 co_rc_t co_os_file_read_write(struct co_monitor *linuxvm, char *filename,
-			      unsigned long long offset, unsigned long size,
+			      unsigned long long offset, uintptr_t size,
 			      vm_ptr_t src_buffer, bool_t read)
 {
 	/* TODO */
 	return CO_RC(ERROR);
 }
 
-co_rc_t co_os_file_set_attr(char *filename, unsigned long valid, struct fuse_attr *attr)
+co_rc_t co_os_file_set_attr(char *filename, uintptr_t valid, struct fuse_attr *attr)
 {
 	/* TODO */
 	return CO_RC(ERROR);
@@ -58,7 +58,7 @@ co_rc_t co_os_file_rename(char *filename, char *dest_filename)
 	return CO_RC(ERROR);
 }
 
-co_rc_t co_os_file_mknod(co_filesystem_t *filesystem, char *filename, unsigned long mode)
+co_rc_t co_os_file_mknod(co_filesystem_t *filesystem, char *filename, uintptr_t mode)
 {
 	/* TODO */
 	return CO_RC(ERROR);

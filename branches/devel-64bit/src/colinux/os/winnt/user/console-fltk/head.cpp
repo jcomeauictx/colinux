@@ -228,7 +228,7 @@ static LRESULT CALLBACK keyboard_hook(
 	return 1;
 }
 
-void co_user_console_keyboard_focus_change( unsigned long keyboard_focus )
+void co_user_console_keyboard_focus_change( uintptr_t keyboard_focus )
 {
 	if ( keyboard_focus == 0 )
 	{

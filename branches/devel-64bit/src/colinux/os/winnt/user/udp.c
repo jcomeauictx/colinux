@@ -44,7 +44,7 @@ int co_udp_socket_connect(const char *addr, unsigned short int port)
 	return sock;
 }
 
-int co_udp_socket_send(int sock, const char *buffer, unsigned long size)
+int co_udp_socket_send(int sock, const char *buffer, uintptr_t size)
 {
 	return send(sock, buffer, size, 0);
 }

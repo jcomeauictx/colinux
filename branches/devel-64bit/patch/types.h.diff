@@ -1,0 +1,14 @@
+--- linux-2.6.33.5-source/include/linux/types.h.orig	2014-11-22 16:07:00.000000000 +0100
++++ linux-2.6.33.5-source/include/linux/types.h	2014-11-22 16:07:31.348182000 +0100
+@@ -38,7 +38,11 @@
+ typedef __kernel_uid16_t        uid16_t;
+ typedef __kernel_gid16_t        gid16_t;
+ 
++#ifdef _WIN64
++typedef unsigned __int64		uintptr_t;
++#else
+ typedef unsigned long		uintptr_t;
++#endif
+ 
+ #ifdef CONFIG_UID16
+ /* This is defined by include/asm-{arch}/posix_types.h */

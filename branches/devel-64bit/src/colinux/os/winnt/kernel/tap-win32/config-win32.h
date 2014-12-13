@@ -41,7 +41,7 @@
 #define random rand
 #define srandom srand
 
-typedef unsigned long in_addr_t;
+typedef unsigned int in_addr_t;
 
 #ifndef _SSIZE_T_
 #define _SSIZE_T_

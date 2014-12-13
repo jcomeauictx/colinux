@@ -36,7 +36,7 @@ extern co_rc_t co_queue_flush(co_queue_t *queue);
 /**
  * return the number of items in the queue.
  */
-static inline unsigned long co_queue_size(co_queue_t *queue)
+static inline uintptr_t co_queue_size(co_queue_t *queue)
 { return queue->items_count; }
 
 

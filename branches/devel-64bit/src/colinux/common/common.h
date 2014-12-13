@@ -22,9 +22,9 @@
  * happening by defining common types for both compilation modes.
  */
 
-typedef unsigned long linux_pte_t;
-typedef unsigned long linux_pmd_t;
-typedef unsigned long linux_pgd_t;
+typedef uintptr_t linux_pte_t;
+typedef uintptr_t linux_pmd_t;
+typedef uintptr_t linux_pgd_t;
 
 #include <linux/cooperative.h>
 

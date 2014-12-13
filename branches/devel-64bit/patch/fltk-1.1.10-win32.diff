@@ -41,15 +41,30 @@ diff -ru -x .o -x .a -x .exe fltk-1.1.10/FL/Fl_Menu_Item.H fltk-first/FL/Fl_Menu
  
  #  if defined(__APPLE__) && defined(check)
  #    undef check
-@@ -88,7 +89,7 @@
-   void callback(Fl_Callback1*c, long p=0) {callback_=(Fl_Callback*)c; user_data_=(void*)p;}
+@@ -85,11 +86,11 @@
+   void callback(Fl_Callback* c, void* p) {callback_=c; user_data_=p;}
+   void callback(Fl_Callback* c) {callback_=c;}
+   void callback(Fl_Callback0*c) {callback_=(Fl_Callback*)c;}
+-  void callback(Fl_Callback1*c, long p=0) {callback_=(Fl_Callback*)c; user_data_=(void*)p;}
++  void callback(Fl_Callback1*c, intptr_t p=0) {callback_=(Fl_Callback*)c; user_data_=(void*)p;}
    void* user_data() const {return user_data_;}
    void user_data(void* v) {user_data_ = v;}
 -  long argument() const {return (long)user_data_;}
+-  void argument(long v) {user_data_ = (void*)v;}
 +  intptr_t argument() const {return (intptr_t)user_data_;}
-   void argument(long v) {user_data_ = (void*)v;}
++  void argument(intptr_t v) {user_data_ = (void*)v;}
    int shortcut() const {return shortcut_;}
    void shortcut(int s) {shortcut_ = s;}
+   int submenu() const {return flags&(FL_SUBMENU|FL_SUBMENU_POINTER);}
+@@ -132,7 +133,7 @@
+ 
+   void do_callback(Fl_Widget* o) const {callback_(o, user_data_);}
+   void do_callback(Fl_Widget* o,void* arg) const {callback_(o, arg);}
+-  void do_callback(Fl_Widget* o,long arg) const {callback_(o, (void*)arg);}
++  void do_callback(Fl_Widget* o,intptr_t arg) const {callback_(o, (void*)arg);}
+ 
+   // back-compatability, do not use:
+   int checked() const {return flags&FL_MENU_VALUE;}
 diff -ru -x .o -x .a -x .exe fltk-1.1.10/FL/Fl_Widget.H fltk-first/FL/Fl_Widget.H
 --- fltk-1.1.10/FL/Fl_Widget.H	2007-11-19 11:21:48.000000000 -0500
 +++ fltk-first/FL/Fl_Widget.H	2010-01-20 14:59:41.622819100 -0500
@@ -62,16 +77,39 @@ diff -ru -x .o -x .a -x .exe fltk-1.1.10/FL/Fl_Widget.H fltk-first/FL/Fl_Widget.
  class Fl_Widget;
  class Fl_Window;
  class Fl_Group;
-@@ -155,7 +155,7 @@
-   void callback(Fl_Callback1*c, long p=0) {callback_=(Fl_Callback*)c; user_data_=(void*)p;}
+@@ -38,7 +38,7 @@
+ typedef void (Fl_Callback )(Fl_Widget*, void*);
+ typedef Fl_Callback* Fl_Callback_p; // needed for BORLAND
+ typedef void (Fl_Callback0)(Fl_Widget*);
+-typedef void (Fl_Callback1)(Fl_Widget*, long);
++typedef void (Fl_Callback1)(Fl_Widget*, intptr_t);
+ 
+ struct FL_EXPORT Fl_Label {
+   const char* value;
+@@ -152,11 +152,11 @@
+   void callback(Fl_Callback* c, void* p) {callback_=c; user_data_=p;}
+   void callback(Fl_Callback* c) {callback_=c;}
+   void callback(Fl_Callback0*c) {callback_=(Fl_Callback*)c;}
+-  void callback(Fl_Callback1*c, long p=0) {callback_=(Fl_Callback*)c; user_data_=(void*)p;}
++  void callback(Fl_Callback1*c, intptr_t p=0) {callback_=(Fl_Callback*)c; user_data_=(void*)p;}
    void* user_data() const {return user_data_;}
    void user_data(void* v) {user_data_ = v;}
 -  long argument() const {return (long)user_data_;}
+-  void argument(long v) {user_data_ = (void*)v;}
 +  intptr_t argument() const {return (intptr_t)user_data_;}
-   void argument(long v) {user_data_ = (void*)v;}
++  void argument(intptr_t v) {user_data_ = (void*)v;}
    Fl_When when() const {return (Fl_When)when_;}
    void when(uchar i) {when_ = i;}
-
+ 
+@@ -186,7 +186,7 @@
+   static void default_callback(Fl_Widget*, void*);
+   void do_callback() {callback_(this,user_data_); if (callback_ != default_callback) clear_changed();}
+   void do_callback(Fl_Widget* o,void* arg=0) {callback_(o,arg); if (callback_ != default_callback) clear_changed();}
+-  void do_callback(Fl_Widget* o,long arg) {callback_(o,(void*)arg); if (callback_ != default_callback) clear_changed();}
++  void do_callback(Fl_Widget* o,intptr_t arg) {callback_(o,(void*)arg); if (callback_ != default_callback) clear_changed();}
+   int test_shortcut();
+   static char label_shortcut(const char *t);
+   static int test_shortcut(const char*);
 diff -ru -x .o -x .a -x .exe fltk-1.1.10/fluid/Fl_Widget_Type.cxx fltk-first/fluid/Fl_Widget_Type.cxx
 --- fltk-1.1.10/fluid/Fl_Widget_Type.cxx	2009-06-28 18:09:25.000000000 -0400
 +++ fltk-first/fluid/Fl_Widget_Type.cxx	2010-01-20 15:12:35.618978400 -0500
@@ -344,3 +382,53 @@ diff -ru -x .o -x .a -x .exe fltk-1.1.10/test/unittests.cxx fltk-first/test/unit
    long i = 0, n = win->children();
    for ( ; i<n; i++) 
      win->child(i)->hide();
+Index: fltk-1.1.10/FL/forms.H
+===================================================================
+--- fltk-1.1.10.orig/FL/forms.H
++++ fltk-1.1.10/FL/forms.H
+@@ -32,6 +32,7 @@
+ #include "Fl_Group.H"
+ #include "Fl_Window.H"
+ #include "fl_draw.H"
++#include <stdint.h>
+ 
+ typedef Fl_Widget FL_OBJECT;
+ typedef Fl_Window FL_FORM;
+@@ -175,7 +176,7 @@ inline void fl_remove_io_callback(int fd
+   Fl::remove_fd(fd);} // removes all the callbacks!
+ 
+ // type of callback is different and no "id" number is returned:
+-inline void fl_add_timeout(long msec, void (*cb)(void*), void* v) {
++inline void fl_add_timeout(intptr_t msec, void (*cb)(void*), void* v) {
+   Fl::add_timeout(msec*.001, cb, v);}
+ inline void fl_remove_timeout(int) {}
+ 
+@@ -225,8 +226,8 @@ inline void fl_get_object_geometry(Fl_Wi
+ inline void fl_get_object_position(Fl_Widget* o,int*x,int*y) {
+   *x = o->x(); *y = o->y();}
+ 
+-typedef void (*Forms_CB)(Fl_Widget*, long);
+-inline void fl_set_object_callback(Fl_Widget*o,Forms_CB c,long a) {o->callback(c,a);}
++typedef void (*Forms_CB)(Fl_Widget*, intptr_t);
++inline void fl_set_object_callback(Fl_Widget*o,Forms_CB c,intptr_t a) {o->callback(c,a);}
+ #define fl_set_call_back      fl_set_object_callback
+ inline void fl_call_object_callback(Fl_Widget* o) {o->do_callback();}
+ inline void fl_trigger_object(Fl_Widget* o) {o->do_callback();}
+@@ -463,7 +464,7 @@ inline void fl_set_browser_specialkey(Fl
+ //#define fl_set_browser_leftscrollbar fl_set_browser_leftslider
+ //inline void fl_set_browser_line_selectable(Fl_Widget*, int, int);
+ //inline void fl_get_browser_dimension(Fl_Widget*,int*,int*,int*,int*);
+-//inline void fl_set_browser_dblclick_callback(Fl_Widget*,FL_CALLBACKPTR,long);
++//inline void fl_set_browser_dblclick_callback(Fl_Widget*,FL_CALLBACKPTR,intptr_t);
+ //inline void fl_set_browser_xoffset(Fl_Widget*, FL_Coord);
+ //inline void fl_set_browser_scrollbarsize(Fl_Widget*, int, int);
+ inline void fl_setdisplayed_browser_line(Fl_Widget* o, int n, int i) {
+@@ -730,7 +731,7 @@ inline void fl_delete_menu_item(Fl_Widge
+     ((Fl_Menu_Button*)o)->remove(i-1);}
+ inline void fl_set_menu_item_shortcut(Fl_Widget* o, int i, const char* s) {
+     ((Fl_Menu_Button*)o)->shortcut(i-1,fl_old_shortcut(s));}
+-inline void fl_set_menu_item_mode(Fl_Widget* o, int i, long x) {
++inline void fl_set_menu_item_mode(Fl_Widget* o, int i, intptr_t x) {
+     ((Fl_Menu_Button*)o)->mode(i-1,x);}
+ inline void fl_show_menu_symbol(Fl_Widget*, int ) {
+ /*    ((Fl_Menu_Button*)o)->show_menu_symbol(i); */}

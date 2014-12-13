@@ -38,7 +38,7 @@ static
 int co_os_manager_ioctl_buffer(co_linux_io_t *ioctl, char *buffer, struct file *file)
 {
 	co_rc_t rc;
-	unsigned long return_size = 0;
+	uintptr_t return_size = 0;
 	co_manager_open_desc_t opened = (typeof(opened))(file->private_data);
 
 	if (copy_from_user(buffer, ioctl->input_buffer, ioctl->input_buffer_size))
@@ -58,7 +58,7 @@ int co_os_manager_ioctl_buffer(co_linux_io_t *ioctl, char *buffer, struct file *
 	}
 
 	if (ioctl->output_returned != NULL) {
-		if (copy_to_user(ioctl->output_returned, &return_size, sizeof(unsigned long))) {
+		if (copy_to_user(ioctl->output_returned, &return_size, sizeof(uintptr_t))) {
 			return -EFAULT;
 		}
 	}
@@ -68,10 +68,10 @@ int co_os_manager_ioctl_buffer(co_linux_io_t *ioctl, char *buffer, struct file *
 
 static
 int co_os_manager_ioctl(struct inode *inode, struct file *file,
-			unsigned int cmd, unsigned long arg)
+			unsigned int cmd, uintptr_t arg)
 {
 	co_linux_io_t ioctl;
-	unsigned long buffer_size;
+	uintptr_t buffer_size;
 	int ret = -1;
 
 	if (cmd != CO_LINUX_IOCTL_ID)
@@ -133,7 +133,7 @@ ssize_t co_os_manager_read(struct file *file, char __user *buffer, size_t size, 
 	{
 		co_message_queue_item_t *message_item;
 		co_message_t *message;
-		unsigned long size;
+		uintptr_t size;
 
 		rc = co_queue_peek_tail(queue, (void **)&message_item);
 		if (!CO_OK(rc)) {
@@ -184,9 +184,9 @@ ssize_t co_os_manager_write(struct file *file, const char __user *buffer, size_t
 	co_manager_open_desc_t opened = (typeof(opened))(file->private_data);
 	const char __user *scan_buffer;
 	co_message_t __user *message;
-	unsigned long message_size;
-	long size_left;
-	long position;
+	uintptr_t message_size;
+	intptr_t size_left;
+	intptr_t position;
 	int ret = 0;
 
 	if (!opened)

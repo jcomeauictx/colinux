@@ -63,8 +63,8 @@ ip_output(so, m0)
 	int len, off, error = 0;
 
 	DEBUG_CALL("ip_output");
-	DEBUG_ARG("so = %lx", (long)so);
-	DEBUG_ARG("m0 = %lx", (long)m0);
+	DEBUG_ARG("so = %x", (int)so);
+	DEBUG_ARG("m0 = %x", (int)m0);
 
 	/* We do no options */
 /*	if (opt) {

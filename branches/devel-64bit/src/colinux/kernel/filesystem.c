@@ -185,27 +185,27 @@ static co_rc_t inode_dir_open(co_filesystem_t *filesystem, co_inode_t *inode)
 	return rc;
 }
 
-static co_rc_t inode_open(co_filesystem_t *filesystem, co_inode_t *inode, unsigned long flags)
+static co_rc_t inode_open(co_filesystem_t *filesystem, co_inode_t *inode, uintptr_t flags)
 {
 	return CO_RC(OK);
 }
 
 static co_rc_t inode_read(co_monitor_t *cmon, co_filesystem_t *filesystem, co_inode_t *inode,
-			  unsigned long long offset, unsigned long size,
+			  unsigned long long offset, uintptr_t size,
 			  vm_ptr_t dest_buffer)
 {
 	return filesystem->ops->inode_read_write(cmon, filesystem, inode, offset, size, dest_buffer, PTRUE);
 }
 
 static co_rc_t inode_write(co_monitor_t *cmon, co_filesystem_t *filesystem, co_inode_t *inode,
-			   unsigned long long offset, unsigned long size,
+			   unsigned long long offset, uintptr_t size,
 			   vm_ptr_t src_buffer)
 {
 	return filesystem->ops->inode_read_write(cmon, filesystem, inode, offset, size, src_buffer, PFALSE);
 }
 
-static co_rc_t inode_mknod(co_filesystem_t *filesystem, co_inode_t *dir, unsigned long mode,
-			   unsigned long rdev, char *name, int *ino, struct fuse_attr *attr)
+static co_rc_t inode_mknod(co_filesystem_t *filesystem, co_inode_t *dir, uintptr_t mode,
+			   uintptr_t rdev, char *name, int *ino, struct fuse_attr *attr)
 {
 	co_rc_t rc;
 
@@ -235,7 +235,7 @@ static co_rc_t inode_mknod(co_filesystem_t *filesystem, co_inode_t *dir, unsigne
 	return rc;
 }
 
-static co_rc_t inode_mkdir(co_filesystem_t *filesystem, co_inode_t *inode, unsigned long mode,
+static co_rc_t inode_mkdir(co_filesystem_t *filesystem, co_inode_t *inode, uintptr_t mode,
 			   char *name)
 {
 	return filesystem->ops->inode_mkdir(filesystem, inode, mode, name);
@@ -252,7 +252,7 @@ static co_rc_t inode_rmdir(co_filesystem_t *filesystem, co_inode_t *inode, char 
 }
 
 static co_rc_t inode_set_attr(co_filesystem_t *filesystem, co_inode_t *inode,
-			      unsigned long valid, struct fuse_attr *attr)
+			      uintptr_t valid, struct fuse_attr *attr)
 {
 	return filesystem->ops->inode_set_attr(filesystem, inode, valid, attr);
 }
@@ -291,14 +291,14 @@ static co_rc_t inode_rename(co_filesystem_t *filesystem, co_inode_t *dir,
 static co_rc_t inode_dir_read(co_monitor_t *cmon,
 			      co_inode_t *inode,
 			      vm_ptr_t buff,
-			      unsigned long size,
-			      unsigned long *fill_size,
-			      unsigned long file_pos)
+			      uintptr_t size,
+			      uintptr_t *fill_size,
+			      uintptr_t file_pos)
 {
 	co_filesystem_name_t *name;
-	unsigned long file_pos_seek = 0;
+	uintptr_t file_pos_seek = 0;
 	struct fuse_dirent dirent;
-	unsigned long dirent_size;
+	uintptr_t dirent_size;
 	vm_ptr_t buff_writeptr;
 	co_rc_t rc;
 
@@ -489,7 +489,7 @@ static int translate_code(co_rc_t value)
 
 static co_rc_t fs_mount(co_filesystem_t *filesystem, const char *pathname,
 			int uid, int gid,
-			unsigned long dir_mode, unsigned long file_mode,
+			uintptr_t dir_mode, uintptr_t file_mode,
 			int flags)
 {
 	co_cofsdev_desc_t *desc;
@@ -516,7 +516,7 @@ static co_rc_t fs_stat(co_filesystem_t *filesystem, struct fuse_statfs_out *stat
 }
 
 void co_monitor_file_system(co_monitor_t *cmon, unsigned int unit,
-			    enum fuse_opcode opcode, unsigned long *params)
+			    enum fuse_opcode opcode, uintptr_t *params)
 {
 	int ino = -1;
 	co_filesystem_t *filesystem;
@@ -760,7 +760,7 @@ static co_rc_t flat_mode_getdir(co_filesystem_t *fs, co_inode_t *dir, co_filesys
 }
 
 static co_rc_t flat_mode_inode_read_write(co_monitor_t *linuxvm, co_filesystem_t *filesystem, co_inode_t *inode,
-				  unsigned long long offset, unsigned long size,
+				  unsigned long long offset, uintptr_t size,
 				  vm_ptr_t src_buffer, bool_t read)
 {
 	char *filename;
@@ -776,8 +776,8 @@ static co_rc_t flat_mode_inode_read_write(co_monitor_t *linuxvm, co_filesystem_t
 	return rc;
 }
 
-static co_rc_t flat_mode_inode_mknod(co_filesystem_t *filesystem, co_inode_t *inode, unsigned long mode,
-			     unsigned long rdev, char *name, int *ino, struct fuse_attr *attr)
+static co_rc_t flat_mode_inode_mknod(co_filesystem_t *filesystem, co_inode_t *inode, uintptr_t mode,
+			     uintptr_t rdev, char *name, int *ino, struct fuse_attr *attr)
 {
 	char *filename;
 	co_rc_t rc;
@@ -793,7 +793,7 @@ static co_rc_t flat_mode_inode_mknod(co_filesystem_t *filesystem, co_inode_t *in
 }
 
 static co_rc_t flat_mode_inode_set_attr(co_filesystem_t *filesystem, co_inode_t *inode,
-				unsigned long valid, struct fuse_attr *attr)
+				uintptr_t valid, struct fuse_attr *attr)
 {
 	char *filename;
 	co_rc_t rc;
@@ -811,7 +811,7 @@ static co_rc_t flat_mode_inode_set_attr(co_filesystem_t *filesystem, co_inode_t 
 	return rc;
 }
 
-static co_rc_t flat_mode_inode_mkdir(co_filesystem_t *filesystem, co_inode_t *inode, unsigned long mode,
+static co_rc_t flat_mode_inode_mkdir(co_filesystem_t *filesystem, co_inode_t *inode, uintptr_t mode,
 			     char *name)
 {
 	char *dirname;

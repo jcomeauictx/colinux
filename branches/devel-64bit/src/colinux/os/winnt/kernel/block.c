@@ -10,7 +10,7 @@
 
 #include "ddk.h"
 
-#include <ddk/ntdddisk.h>
+#include <ntdddisk.h>
 
 #include <colinux/common/libc.h>
 #include <colinux/os/alloc.h>
@@ -32,7 +32,7 @@ typedef struct {
 	unsigned char *start;
 	IO_STATUS_BLOCK isb;
 	LARGE_INTEGER offset;
-	unsigned long size;
+	uintptr_t size;
 } callback_context_t;
 
 typedef struct {
@@ -42,7 +42,7 @@ typedef struct {
 
 static co_rc_t transfer_file_block(co_monitor_t *cmon,
 				  void *host_data, void *linuxvm,
-				  unsigned long size,
+				  uintptr_t size,
 				  co_monitor_transfer_dir_t dir)
 {
 	IO_STATUS_BLOCK isb;
@@ -76,8 +76,8 @@ static co_rc_t transfer_file_block(co_monitor_t *cmon,
 	}
 
 	if (status != STATUS_SUCCESS) {
-		co_debug_error("block io failed: %p %lx (reason: %x)",
-				linuxvm, size, (int)status);
+		co_debug_error("block io failed: %p %I64x (reason: %x)",
+				linuxvm, (int64_t)size, (int)status);
 		rc = co_status_convert(status);
 	}
 
@@ -90,7 +90,7 @@ co_rc_t co_os_file_block_read_write(co_monitor_t *monitor,
 				    HANDLE file_handle,
 				    unsigned long long offset,
 				    vm_ptr_t address,
-				    unsigned long size,
+				    uintptr_t size,
 				    bool_t read)
 {
 	co_rc_t rc;
@@ -118,16 +118,16 @@ co_rc_t co_os_file_block_read_write(co_monitor_t *monitor,
 
 static void CALLBACK transfer_file_block_callback(callback_context_t *context, PIO_STATUS_BLOCK IoStatusBlock, ULONG Reserved)
 {
-	co_debug_lvl(filesystem, 10, "cobd%d callback size=%ld info=%ld status=%X",
-			context->msg.linux_message.unit, context->size,
-			(long)IoStatusBlock->Information, (int)IoStatusBlock->Status);
+	co_debug_lvl(filesystem, 10, "cobd%d callback size=%I64d info=%I64d status=%X",
+			context->msg.linux_message.unit, (int64_t)context->size,
+			(int64_t)IoStatusBlock->Information, (int)IoStatusBlock->Status);
 
 	if (IoStatusBlock->Status == STATUS_SUCCESS)
 		context->msg.intr.uptodate = 1;
 	else
-		co_debug("cobd%d callback failed size=%ld info=%ld status=%X",
-			    context->msg.linux_message.unit, context->size,
-			    (unsigned long)IoStatusBlock->Information,
+		co_debug("cobd%d callback failed size=%I64d info=%I64d status=%X",
+			    context->msg.linux_message.unit, (int64_t)context->size,
+			    (int64_t)IoStatusBlock->Information,
 			    (int)IoStatusBlock->Status);
 
 	co_monitor_host_linuxvm_transfer_unmap(context->monitor, context->page, context->pfn);
@@ -138,7 +138,7 @@ static co_rc_t co_os_file_block_async_read_write(co_monitor_t *monitor,
 				    HANDLE file_handle,
 				    unsigned long long offset,
 				    vm_ptr_t address,
-				    unsigned long size,
+				    uintptr_t size,
 				    bool_t read,
 				    int unit,
 				    void *irq_request)
@@ -203,7 +203,7 @@ static co_rc_t co_os_file_block_async_read_write(co_monitor_t *monitor,
 			return CO_RC(OK);
 
 		rc = co_status_convert(status);
-		co_debug("block io failed: %p %lx (reason: %x)", context->start, size, (int)status);
+		co_debug("block io failed: %p %I64x (reason: %x)", context->start, (int64_t)size, (int)status);
 		co_monitor_host_linuxvm_transfer_unmap(monitor, context->page, context->pfn);
 	}
 
@@ -247,7 +247,7 @@ static co_rc_t co_os_file_block_write(co_monitor_t *linuxvm, co_block_dev_t *dev
 					   request->size, PFALSE);
 }
 
-static bool_t probe_area(HANDLE handle, LARGE_INTEGER offset, char *test_buffer, unsigned long size)
+static bool_t probe_area(HANDLE handle, LARGE_INTEGER offset, char *test_buffer, uintptr_t size)
 {
 	IO_STATUS_BLOCK isb;
 	NTSTATUS status;
@@ -279,8 +279,8 @@ static co_rc_t co_os_file_block_detect_size_binary_search(HANDLE handle, unsigne
 
 	LARGE_INTEGER scan_bit;
 	LARGE_INTEGER build_size;
-	unsigned long test_buffer_size_max = 0x4000;
-	unsigned long test_buffer_size = 0x100;
+	uintptr_t test_buffer_size_max = 0x4000;
+	uintptr_t test_buffer_size = 0x100;
 	char *test_buffer;
 
 	test_buffer = co_os_malloc(test_buffer_size_max);
@@ -329,7 +329,7 @@ static co_rc_t co_os_file_block_detect_size_binary_search(HANDLE handle, unsigne
 	build_size.QuadPart += test_buffer_size;
 
 	*out_size = build_size.QuadPart;
-	co_debug("detected size: %lu KBs", (unsigned long)(build_size.QuadPart >> 10));
+	co_debug("detected size: %I64u KBs", (uint64_t)(build_size.QuadPart >> 10));
 
 	co_os_free(test_buffer);
 	return CO_RC(OK);
@@ -349,7 +349,7 @@ static co_rc_t co_os_file_block_detect_size_harddisk(HANDLE handle, unsigned lon
 
 	if (status == STATUS_SUCCESS) {
 		*out_size = length.Length.QuadPart;
-		co_debug("returned size: %lu KBs", (unsigned long)(*out_size >> 10));
+		co_debug("returned size: %I64u KBs", (uint64_t)(*out_size >> 10));
 		return CO_RC(OK);
 	}
 	co_debug("fail status %X", (int)status);
@@ -371,7 +371,7 @@ static co_rc_t co_os_file_block_detect_size_standard(HANDLE handle, unsigned lon
 
 	if (status == STATUS_SUCCESS) {
 		*out_size = fsi.EndOfFile.QuadPart;
-		co_debug("reported size: %lu KBs", (unsigned long)(*out_size >> 10));
+		co_debug("reported size: %I64u KBs", (uint64_t)(*out_size >> 10));
 		return CO_RC(OK);
 	} if (status != STATUS_INVALID_DEVICE_REQUEST)
 		co_debug("fail status %X", (int)status);

@@ -44,7 +44,7 @@ void co_winnt_set_service_restart_options(SC_HANDLE schService)
 	hLib = LoadLibrary("Advapi32.dll");
 
 	if (hLib != NULL) {
-		ChangeServiceConfig2Ptr = GetProcAddress(hLib,"ChangeServiceConfig2A");
+		ChangeServiceConfig2Ptr = (BOOL (WINAPI*)(SC_HANDLE, DWORD, LPVOID))GetProcAddress(hLib,"ChangeServiceConfig2A");
 		FreeLibrary(hLib);
 	}
 

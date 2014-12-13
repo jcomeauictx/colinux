@@ -12,7 +12,7 @@
 
 #include <colinux/os/kernel/user.h>
 
-co_rc_t co_copy_to_user(char *user_address, char *kernel_address, unsigned long size)
+co_rc_t co_copy_to_user(char *user_address, char *kernel_address, uintptr_t size)
 {
 	int ret;
 
@@ -23,7 +23,7 @@ co_rc_t co_copy_to_user(char *user_address, char *kernel_address, unsigned long 
 	return CO_RC(OK);;
 }
 
-co_rc_t co_copy_from_user(char *user_address, char *kernel_address, unsigned long size)
+co_rc_t co_copy_from_user(char *user_address, char *kernel_address, uintptr_t size)
 {
 	int ret;
 

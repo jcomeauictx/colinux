@@ -72,7 +72,7 @@ tcp_output(tp)
 	register struct tcpcb *tp;
 {
 	register struct socket *so = tp->t_socket;
-	register long len, win;
+	register int len, win;
 	int off, flags, error;
 	register struct mbuf *m;
 	register struct tcpiphdr *ti;
@@ -81,7 +81,7 @@ tcp_output(tp)
 	int idle, sendalot;
 
 	DEBUG_CALL("tcp_output");
-	DEBUG_ARG("tp = %lx", (long )tp);
+	DEBUG_ARG("tp = %lx", (int )tp);
 
 	/*
 	 * Determine length of data that should be transmitted,
@@ -205,12 +205,12 @@ again:
 		 * taking into account that we are limited by
 		 * TCP_MAXWIN << tp->rcv_scale.
 		 */
-		long adv = min(win, (long)TCP_MAXWIN << tp->rcv_scale) -
+		int adv = min(win, (int)TCP_MAXWIN << tp->rcv_scale) -
 			(tp->rcv_adv - tp->rcv_nxt);
 
-		if (adv >= (long) (2 * tp->t_maxseg))
+		if (adv >= (int) (2 * tp->t_maxseg))
 			goto send;
-		if (2 * adv >= (long) so->so_rcv.sb_datalen)
+		if (2 * adv >= (int) so->so_rcv.sb_datalen)
 			goto send;
 	}
 
@@ -439,12 +439,12 @@ send:
 	 * Calculate receive window.  Don't shrink window,
 	 * but avoid silly window syndrome.
 	 */
-	if (win < (long)(so->so_rcv.sb_datalen / 4) && win < (long)tp->t_maxseg)
+	if (win < (int)(so->so_rcv.sb_datalen / 4) && win < (int)tp->t_maxseg)
 		win = 0;
-	if (win > (long)TCP_MAXWIN << tp->rcv_scale)
-		win = (long)TCP_MAXWIN << tp->rcv_scale;
-	if (win < (long)(tp->rcv_adv - tp->rcv_nxt))
-		win = (long)(tp->rcv_adv - tp->rcv_nxt);
+	if (win > (int)TCP_MAXWIN << tp->rcv_scale)
+		win = (int)TCP_MAXWIN << tp->rcv_scale;
+	if (win < (int)(tp->rcv_adv - tp->rcv_nxt))
+		win = (int)(tp->rcv_adv - tp->rcv_nxt);
 	ti->ti_win = htons((u_int16_t) (win>>tp->rcv_scale));
 
 	if (SEQ_GT(tp->snd_up, tp->snd_una)) {

@@ -136,7 +136,7 @@ co_rc_t co_user_monitor_load_section(co_user_monitor_t*		      umon,
 				     co_monitor_ioctl_load_section_t* params)
 {
 	co_monitor_ioctl_load_section_t *params_copy = NULL;
-	unsigned long alloc_size = 0;
+	uintptr_t alloc_size = 0;
 	co_rc_t rc;
 
 	alloc_size = sizeof(*params);
@@ -163,10 +163,10 @@ co_rc_t co_user_monitor_load_section(co_user_monitor_t*		      umon,
 }
 
 co_rc_t co_user_monitor_load_initrd(co_user_monitor_t *umon,
-				    void *initrd, unsigned long initrd_size)
+				    void *initrd, uintptr_t initrd_size)
 {
 	co_monitor_ioctl_load_initrd_t *params_copy = NULL;
-	unsigned long alloc_size = 0;
+	uintptr_t alloc_size = 0;
 	co_rc_t rc;
 
 	alloc_size = sizeof(*params_copy) + initrd_size;

@@ -40,14 +40,14 @@ co_rc_t co_arch_anti_nx_init(co_monitor_t *mon)
 	co_rc_t rc;
 	bool_t pae_enabled;
 	co_pfn_t pfn, pfn_next;
-	unsigned long cr3;
+	uintptr_t cr3;
 	unsigned char *page;
 	unsigned long long *ptes;
-	unsigned long vaddr;
+	uintptr_t vaddr;
 
 	archdep = mon->archdep;
 	marchdep = mon->manager->archdep;
-	vaddr = (unsigned long)mon->passage_page;
+	vaddr = (uintptr_t)mon->passage_page;
 
 	co_debug_lvl(misc, 11, "vaddr = %08lx", vaddr);
 
@@ -65,7 +65,7 @@ co_rc_t co_arch_anti_nx_init(co_monitor_t *mon)
 	cr3 = co_get_cr3();
 	co_debug_lvl(misc, 11, "cr3 = %08lx", cr3);
 	pfn = cr3 >> CO_ARCH_PAGE_SHIFT;
-	co_debug("pfn = %08lx", (long)pfn);
+	co_debug("pfn = %08I64x", (uintptr_t)pfn);
 	page = co_os_map(mon->manager, pfn);
 	if (!page) {
 		rc = CO_RC(ERROR);

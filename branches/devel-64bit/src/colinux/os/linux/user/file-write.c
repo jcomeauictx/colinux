@@ -14,7 +14,7 @@
 
 #include <colinux/os/user/file.h>
 
-co_rc_t co_os_file_write(co_pathname_t pathname, void *buf, unsigned long size)
+co_rc_t co_os_file_write(co_pathname_t pathname, void *buf, uintptr_t size)
 {
 	int fd, wr;
 

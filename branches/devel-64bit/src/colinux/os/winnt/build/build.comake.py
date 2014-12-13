@@ -14,7 +14,7 @@ targets['executables'] = Target(
     Input('colinux-console-fltk.exe'),
     Input('colinux-debug-daemon.exe'),
     Input('colinux-console-nt.exe'),
-#    Input('colinux-bridged-net-daemon.exe'),
+    Input('colinux-bridged-net-daemon.exe'),
     Input('colinux-ndis-net-daemon.exe'),
     Input('colinux-slirp-net-daemon.exe'),
     Input('colinux-serial-daemon.exe'),

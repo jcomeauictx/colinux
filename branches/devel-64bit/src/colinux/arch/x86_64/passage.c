@@ -72,25 +72,25 @@ void co_monitor_arch_passage_page_free(co_monitor_t *cmon)
 
 static inline void co_passage_page_dump_state(co_arch_state_stack_t *state)
 {
-	co_debug("cs: %04lx   ds: %04lx   es: %04lx   fs: %04lx   gs: %04lx   ss: %04lx",
-		 state->cs, state->ds, state->es, state->fs, state->gs, state->ss);
+	co_debug("cs: %04I64x   ds: %04I64x   es: %04I64x   fs: %04I64x   gs: %04I64x   ss: %04I64x",
+		 (int64_t)state->cs, state->ds, (int64_t)state->es, (int64_t)state->fs, (int64_t)state->gs, (int64_t)state->ss);
 
-	co_debug("cr0: %08lx   cr2: %08lx   cr3: %08lx   cr4: %08lx",
-		 state->cr0, state->cr2, state->cr3, state->cr4);
+	co_debug("cr0: %08I64x   cr2: %08I64x   cr3: %08I64x   cr4: %08I64x",
+		 (int64_t)state->cr0, (int64_t)state->cr2, (int64_t)state->cr3, (int64_t)state->cr4);
 
-	co_debug("dr0: %08lx   dr1: %08lx  dr2: %08lx  dr3: %08lx  dr6: %08lx  dr7: %08lx",
-		 state->dr0, state->dr1, state->dr2, state->dr3, state->dr6, state->dr7);
+	co_debug("dr0: %08I64x   dr1: %08I64x  dr2: %08I64x  dr3: %08I64x  dr6: %08I64x  dr7: %08I64x",
+		 (int64_t)state->dr0, (int64_t)state->dr1, (int64_t)state->dr2, (int64_t)state->dr3, (int64_t)state->dr6, (int64_t)state->dr7);
 
-	co_debug("gdt: %08lx:%04x   idt:%08lx:%04x   ldt:%04x  tr:%04x",
-		 (long)state->gdt.base, state->gdt.limit,
-		 (long)state->idt.table, state->idt.size,
+	co_debug("gdt: %08I64x:%04x   idt:%08I64x:%04x   ldt:%04x  tr:%04x",
+		 (int64_t)state->gdt.base, state->gdt.limit,
+		 (int64_t)state->idt.table, state->idt.size,
 		 state->ldt, state->tr);
 
-	co_debug("return_eip: %08lx   flags: %08lx   esp: %08lx",
-		 state->return_eip, state->flags, state->esp);
+	co_debug("return_eip: %08I64x   flags: %08I64x   esp: %08I64x",
+		 (int64_t)state->return_eip, (int64_t)state->flags, (int64_t)state->esp);
 
-	co_debug("sysenter cs: %08lx    eip: %08lx   esp: %08lx",
-		 state->sysenter_cs, state->sysenter_eip, state->sysenter_esp);
+	co_debug("sysenter cs: %08I64x    eip: %08I64x   esp: %08I64x",
+		 (int64_t)state->sysenter_cs, (int64_t)state->sysenter_eip, (int64_t)state->sysenter_esp);
 }
 
 static inline void co_passage_page_dump(co_arch_passage_page_t *page)
@@ -103,14 +103,14 @@ static inline void co_passage_page_dump(co_arch_passage_page_t *page)
 }
 
 static void short_temp_address_space_init(co_arch_passage_page_normal_address_space_t *pp,
-					  unsigned long pa, unsigned long *va)
+					  uintptr_t pa, uintptr_t *va)
 {
 	int i;
 
 	struct {
-		unsigned long pmd;
-		unsigned long pte;
-		unsigned long paddr;
+		uintptr_t pmd;
+		uintptr_t pte;
+		uintptr_t paddr;
 	} maps[2];
 
 	for (i=0; i < 2; i++) {
@@ -153,17 +153,17 @@ static void short_temp_address_space_init(co_arch_passage_page_normal_address_sp
  * to the physical address of the passage page.
  */
 static void normal_temp_address_space_init(co_arch_passage_page_normal_address_space_t *as,
-					   unsigned long pa, unsigned long va)
+					   uintptr_t pa, uintptr_t va)
 {
 	int i;
-	unsigned long vas[2] = {
-		(unsigned long)(va),
-		(unsigned long)(pa),
+	uintptr_t vas[2] = {
+		(uintptr_t)(va),
+		(uintptr_t)(pa),
 	};
 
 	for (i=0; i < 2; i++) {
-		unsigned long pmd = vas[i] >> CO_ARCH_PMD_SHIFT;
-		unsigned long pte = (vas[i] & ~CO_ARCH_PMD_MASK) >> CO_ARCH_PAGE_SHIFT;
+		uintptr_t pmd = vas[i] >> CO_ARCH_PMD_SHIFT;
+		uintptr_t pte = (vas[i] & ~CO_ARCH_PMD_MASK) >> CO_ARCH_PAGE_SHIFT;
 		int j = i;
 
 		if (!as->pgd[pmd]) {
@@ -177,18 +177,18 @@ static void normal_temp_address_space_init(co_arch_passage_page_normal_address_s
 }
 
 static void pae_temp_address_space_init(co_arch_passage_page_pae_address_space_t *as,
-					unsigned long pa, unsigned long va)
+					uintptr_t pa, uintptr_t va)
 {
 	int i;
-	unsigned long vas[2] = {
-		(unsigned long)(va),
-		(unsigned long)(pa),
+	uintptr_t vas[2] = {
+		(uintptr_t)(va),
+		(uintptr_t)(pa),
 	};
 
 	for (i=0; i < 2; i++) {
-		unsigned long pgd = vas[i] >> CO_ARCH_PAE_PGD_SHIFT;
-		unsigned long pmd = (vas[i] & ~CO_ARCH_PAE_PGD_MASK) >> CO_ARCH_PAE_PMD_SHIFT;
-		unsigned long pte = (vas[i] & ~CO_ARCH_PAE_PMD_MASK) >> CO_ARCH_PAGE_SHIFT;
+		uintptr_t pgd = vas[i] >> CO_ARCH_PAE_PGD_SHIFT;
+		uintptr_t pmd = (vas[i] & ~CO_ARCH_PAE_PGD_MASK) >> CO_ARCH_PAE_PMD_SHIFT;
+		uintptr_t pte = (vas[i] & ~CO_ARCH_PAE_PMD_MASK) >> CO_ARCH_PAGE_SHIFT;
 		int j = i, k = i;
 
 		if (!as->main[pgd]) {
@@ -211,7 +211,7 @@ static void pae_temp_address_space_init(co_arch_passage_page_pae_address_space_t
 co_rc_t co_monitor_arch_passage_page_init(co_monitor_t *cmon)
 {
 	co_arch_passage_page_t *pp = cmon->passage_page;
-	unsigned long caps;
+	//uintptr_t caps;
 
 /* ...
 	if (co_monitor_passage_func_short_sysenter_size() > sizeof (pp->code))
@@ -247,9 +247,9 @@ co_rc_t co_monitor_arch_passage_page_init(co_monitor_t *cmon)
 	 * Init temporary address space page tables for host side:
 	 */
 	if (!co_is_pae_enabled()) {
-		unsigned long va[2] = {
-			(unsigned long)(cmon->passage_page_vaddr),
-			(unsigned long)(pp),
+		uintptr_t va[2] = {
+			(uintptr_t)(cmon->passage_page_vaddr),
+			(uintptr_t)(pp),
 		};
 
 		pp->temp_pgd_physical = co_os_virt_to_phys(&pp->temp_space.pgd);
@@ -260,18 +260,18 @@ co_rc_t co_monitor_arch_passage_page_init(co_monitor_t *cmon)
 
 	} else {
 		pae_temp_address_space_init(&pp->host_pae, pp->self_physical_address,
-					    (unsigned long)(&pp->first_page));
+					    (uintptr_t)(&pp->first_page));
 		pp->host_state.temp_cr3 = co_os_virt_to_phys(&pp->host_pae);
-		pp->host_state.va = (unsigned long)(&pp->first_page);
+		pp->host_state.va = (uintptr_t)(&pp->first_page);
 
 		/*
 		 * Init the Linux context.
 		 */
 		pp->linuxvm_state.temp_cr3 = co_os_virt_to_phys(&pp->guest_normal);
 		normal_temp_address_space_init(&pp->guest_normal, pp->self_physical_address,
-					       (unsigned long)(cmon->passage_page_vaddr));
+					       (uintptr_t)(cmon->passage_page_vaddr));
 
-		pp->linuxvm_state.va = (unsigned long)(cmon->passage_page_vaddr);
+		pp->linuxvm_state.va = (uintptr_t)(cmon->passage_page_vaddr);
 	}
 
 	pp->linuxvm_state.dr0 = co_get_dr0();
