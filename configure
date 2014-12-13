@@ -596,12 +596,12 @@ check_depmod()
 		 which depmod 2>/dev/null`; then
 
     # Depmod 2.4.x is bugy with "-V" only, "--help" does nothing real.
-    installed=`$depmod_cfg -V --help 2>/dev/null | grep module-init-tools`
+    installed=`$depmod_cfg -V --help 2>/dev/null | grep -E 'module-init-tools|kmod version'`
     if [ -z "$installed" ]; then
       cat << EOF
 ($depmod_cfg) wrong version.
 
-	Warning: you may need to install module-init-tools"
+	Warning: you may need to install module-init-tools
 	See http://www.codemonkey.org.uk/docs/post-halloween-2.6.txt
 
 	Install the file 'depmod', in directory
