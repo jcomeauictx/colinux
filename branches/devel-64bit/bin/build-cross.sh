@@ -34,14 +34,13 @@ download64()
 
 	# Prebuild GCC MinGW for Linux (43M download, 227M used)
 	test -f $DOWNLOADS/$MINGW_PACK || \
-	 wget $MINGW_PACK_URL -P $DOWNLOADS
+	 wget $MINGW_PACK_URL -O $DOWNLOADS/$MINGW_PACK
 }
 
 unpack64()
 {
 	if [ ! -d $PREFIX/$TARGET/include ]
 	then
-		# "sezero" does not tar'ed standard PREFIX. So, unpack somewhere and move
 		echo "Unpack MinGW binary..."
 		mkdir -p $PREFIX
 		tar xjf $DOWNLOADS/$MINGW_PACK -C $PREFIX
