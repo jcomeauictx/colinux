@@ -1,0 +1,23 @@
+# x86: fix ptrace.o compile error
+# from https://lkml.org/lkml/2012/8/9/281
+--- linux-2.6.33.5-source.orig/arch/x86/include/asm/ptrace.h
++++ linux-2.6.33.5-source/arch/x86/include/asm/ptrace.h
+@@ -131,6 +131,7 @@
+ #ifdef __KERNEL__
+ 
+ #include <linux/init.h>
++#include <linux/linkage.h>
+ 
+ struct cpuinfo_x86;
+ struct task_struct;
+@@ -143,8 +144,8 @@
+ 			 int error_code, int si_code);
+ void signal_fault(struct pt_regs *regs, void __user *frame, char *where);
+ 
+-extern long syscall_trace_enter(struct pt_regs *);
+-extern void syscall_trace_leave(struct pt_regs *);
++extern asmregparm long syscall_trace_enter(struct pt_regs *);
++extern asmregparm void syscall_trace_leave(struct pt_regs *);
+ 
+ static inline unsigned long regs_return_value(struct pt_regs *regs)
+ {
