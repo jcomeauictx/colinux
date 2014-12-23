@@ -1,0 +1,11 @@
+PCap patch:
+The WpdPack_4_1_1.zip is missing the 64bit version of libwpcap.a. See:
+http://marc.info/?l=winpcap-users&m=128638645618841
+
+The libwpcap.a binary patch has been created using gendef.exe + dlltool.exe
+from c:\Windows\SysWOW64\wpcap.dll version 4.1.3 installed on a Windows 7 64bit PC.
+Instruction how to do this was found at:
+http://www.perlmonks.org/?node_id=896237
+
+Hopefully next release of WpdPack_x_x_x.zip will include the 64bit libwpcap.a.
+This binary patch can then be removed.

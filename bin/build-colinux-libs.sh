@@ -201,7 +201,7 @@ install_winpcap()
 	cp -p -r Include/pcap \
 	    "$PREFIX/$TARGET/include"
 	test $? -ne 0 && error_exit 10 "winpcap install headers failed"
-	cp -p "$USER_TOPDIR/pcap-lib/libwpcap.a" "$PREFIX/$TARGET/lib"
+	cp -p "$TOPDIR/patch/bin-patch/libwpcap.a" "$PREFIX/$TARGET/lib"
 	test $? -ne 0 && error_exit 10 "winpcap install lib failed"
 }
 
