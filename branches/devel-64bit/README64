@@ -12,7 +12,8 @@ Of curse, coLinux is NOT running now, because porting is not complete!
 First download current source from SVN:
 
 	cd ...somewhere in your $HOME...
-	svn co http://colinux.svn.sourceforge.net/svnroot/colinux/branches/devel-64bit devel-64bit
+	svn checkout http://svn.code.sf.net/p/colinux/code/branches/devel-64bit
+	cd devel-64bit
 
 Run with ./configure --help to see all options:
 
