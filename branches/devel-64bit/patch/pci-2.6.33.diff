@@ -2,7 +2,7 @@ Index: linux-2.6.33-source/arch/x86/Kconfig
 ===================================================================
 --- linux-2.6.33-source.orig/arch/x86/Kconfig
 +++ linux-2.6.33-source/arch/x86/Kconfig
-@@ -1893,6 +1893,9 @@
+@@ -1897,6 +1897,9 @@
  	  direct access method and falls back to the BIOS if that doesn't
  	  work. If unsure, go with the default, which is "Any".
  
@@ -12,19 +12,27 @@ Index: linux-2.6.33-source/arch/x86/Kconfig
  config PCI_GOBIOS
  	bool "BIOS"
  
-@@ -1911,6 +1914,11 @@
+@@ -1915,6 +1918,11 @@
  
  endchoice
  
 +config PCI_COOPERATIVE
 +	bool
-+ 	depends on PCI && PCI_GOCO && COOPERATIVE
++ 	depends on PCI && COOPERATIVE
 +	default y
 +
  config PCI_BIOS
  	def_bool y
  	depends on X86_32 && PCI && (PCI_GOBIOS || PCI_GOANY)
-@@ -1992,6 +2000,7 @@
+@@ -1923,6 +1974,7 @@
+ config PCI_DIRECT
+ 	def_bool y
+ 	depends on PCI && (X86_64 || (PCI_GODIRECT || PCI_GOANY || PCI_GOOLPC))
++	depends on !COOPERATIVE
+ 
+ config PCI_MMCONFIG
+ 	def_bool y
+@@ -1996,6 +2006,7 @@
  
  # x86_64 have no ISA slots, but do have ISA-style DMA.
  config ISA_DMA_API

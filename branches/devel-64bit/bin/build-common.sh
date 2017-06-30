@@ -62,7 +62,7 @@ case $OSTYPE in
 esac
 
 # ARCH must overwrite for builds on 64 bit (target kernel)
-TARGET_GUEST_ARCH=i386
+TARGET_GUEST_ARCH=x86_64
 
 # Updated by Sam Lantinga <slouken@libsdl.org>
 # These are the files from the current MingW release

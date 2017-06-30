@@ -29,9 +29,9 @@ typedef uintptr_t co_pfn_t;
 #define _PAGE_PSE       0x080   /* 4 MB (or 2MB) page, Pentium+, if present.. */
 #define CO_ARCH_PAGE_NX        0x8000000000000000ULL
 
-#define PTRS_PER_PTE    1024
+#define PTRS_PER_PTE    512
 #define PGDIR_SHIFT     22
-#define PTRS_PER_PGD    1024
+#define PTRS_PER_PGD    512
 
 #define CO_ARCH_PMD_SHIFT       22
 #define CO_ARCH_PMD_MASK        (~(CO_ARCH_PMD_SIZE-1))
@@ -48,6 +48,6 @@ typedef uintptr_t co_pfn_t;
 #define CO_ARCH_PAGE_SHIFT      12
 #define CO_ARCH_PAGE_SIZE       (1 << CO_ARCH_PAGE_SHIFT)
 #define CO_ARCH_PAGE_MASK       (~(CO_ARCH_PAGE_SIZE-1))
-#define CO_ARCH_KERNEL_OFFSET   0xc0000000
+#define CO_ARCH_KERNEL_OFFSET   0xffffffff80000000
 
 #endif
