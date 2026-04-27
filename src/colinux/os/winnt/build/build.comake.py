@@ -31,13 +31,16 @@ def generate_options(compiler_def_type, libs=None, lflags=None):
         libs = []
     if not lflags:
         lflags = []
+    compile_flags = []
+    if getenv('COLINUX_ENABLE_MNO_CYGWIN') == "yes":
+        compile_flags.append('-mno-cygwin')
     return Options(
         overriders = dict(
             compiler_def_type = compiler_def_type,
             compiler_strip = True,
         ),
         appenders = dict(
-        compiler_flags = [ '-mno-cygwin' ],
+        compiler_flags = compile_flags,
         linker_flags = lflags,
         compiler_libs = libs + [
             'user32', 'gdi32', 'ws2_32', 'ntdll', 'kernel32', 'ole32', 'uuid', 'gdi32',
