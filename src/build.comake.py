@@ -2,10 +2,7 @@
 # to be read by bin/make.py. Please run bin/make.py --help.
 
 import os
-try:
-    from shutil import which
-except ImportError:
-    which = None
+import shutil
 
 from comake.settings import settings
 
@@ -68,7 +65,10 @@ if settings.host_os == 'winnt':
     cross_compilation_prefix = os.getenv('COLINUX_HOST_MINGW_PREFIX')
     if not cross_compilation_prefix:
         def has_tool(name):
-            return which(name) if which else None
+            which_tool = getattr(__import__('shutil'), 'which', None)
+            if which_tool:
+                return which_tool(name)
+            return None
         if host_mingw_bits == '64':
             if has_tool('x86_64-w64-mingw32-gcc'):
                 cross_compilation_prefix = 'x86_64-w64-mingw32-'
@@ -101,8 +101,8 @@ if settings.host_os == 'winnt':
         ]
     compiler_defines['WINVER'] = '0x0500'
     cross_gcc = None
-    if which:
-        cross_gcc = which('%sgcc' % cross_compilation_prefix)
+    if hasattr(shutil, 'which'):
+        cross_gcc = shutil.which('%sgcc' % cross_compilation_prefix)
     cross_ddk_include = None
     if cross_gcc:
         cross_gcc_dir = os.path.dirname(os.path.dirname(cross_gcc))
@@ -154,10 +154,10 @@ else:
         pathjoin(settings.target_kernel_build, 'include2'),
         pathjoin(settings.target_kernel_source, 'arch/x86/include'),
         pathjoin(settings.target_kernel_source, 'include') ]
-if cross_ddk_include:
-    settings.target_kernel_includes.append(cross_ddk_include)
 if extra_include_paths:
     settings.target_kernel_includes.extend(extra_include_paths)
+if cross_ddk_include:
+    settings.target_kernel_includes.append(cross_ddk_include)
 if extra_lib_paths:
     settings.compiler_lib_paths = extra_lib_paths
 

@@ -1,8 +1,5 @@
 from os import getenv
 
-host_mingw_bits = getenv('COLINUX_HOST_MINGW_BITS', '32')
-mingw_entry_symbol = '_DriverEntry@8' if host_mingw_bits == '32' else 'DriverEntry'
-
 def optional_targets():
     import os
     enable_fltk = getenv('COLINUX_ENABLE_FLTK')
@@ -173,6 +170,8 @@ targets['driver.o'] = Target(
 
 def script_cmdline(scripter, tool_run_inf):
     inputs = tool_run_inf.target.get_actual_inputs()
+    host_mingw_bits = getenv('COLINUX_HOST_MINGW_BITS', '32')
+    mingw_entry_symbol = '_DriverEntry@8' if host_mingw_bits == '32' else 'DriverEntry'
     command_line = ((
         "%s "
         "-Wl,--strip-debug "
@@ -210,6 +209,8 @@ targets['linux.sys'] = Target(
 
 def script_cmdline(scripter, tool_run_inf):
     inputs = tool_run_inf.target.get_actual_inputs()
+    host_mingw_bits = getenv('COLINUX_HOST_MINGW_BITS', '32')
+    mingw_entry_symbol = '_DriverEntry@8' if host_mingw_bits == '32' else 'DriverEntry'
     command_line = ((
         "%s "
         "--dllname linux.sys "
@@ -230,6 +231,8 @@ targets['driver.base.exp'] = Target(
 
 def script_cmdline(scripter, tool_run_inf):
     inputs = tool_run_inf.target.get_actual_inputs()
+    host_mingw_bits = getenv('COLINUX_HOST_MINGW_BITS', '32')
+    mingw_entry_symbol = '_DriverEntry@8' if host_mingw_bits == '32' else 'DriverEntry'
     command_line = ((
         "%s "
         "-Wl,--base-file,%s "
@@ -238,8 +241,8 @@ def script_cmdline(scripter, tool_run_inf):
         "-o junk.tmp %s -lndis -lntoskrnl -lhal -lgcc ; "
         "rm -f junk.tmp") %
     (scripter.get_cross_build_tool('gcc', tool_run_inf),
-     mingw_entry_symbol,
      tool_run_inf.target.pathname,
+     mingw_entry_symbol,
      inputs[0].pathname))
     return command_line
 
