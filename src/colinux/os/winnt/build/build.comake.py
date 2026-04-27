@@ -1,17 +1,20 @@
 def optional_targets():
     import os
     from os import getenv
+    enable_fltk = getenv('COLINUX_ENABLE_FLTK')
     enable_wx = getenv('COLINUX_ENABLE_WX')
+    out = []
+    if enable_fltk != "no":
+        out.append(Input('colinux-console-fltk.exe'))
     if enable_wx:
         if enable_wx == "yes":
-            return [Input('colinux-console-wx.exe')]
-    return []
+            out.append(Input('colinux-console-wx.exe'))
+    return out
 
 targets['executables'] = Target(
     inputs=[
     Input('colinux-daemon.exe'),
     Input('colinux-net-daemon.exe'),
-    Input('colinux-console-fltk.exe'),
     Input('colinux-debug-daemon.exe'),
     Input('colinux-console-nt.exe'),
     Input('colinux-bridged-net-daemon.exe'),
