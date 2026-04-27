@@ -1,6 +1,10 @@
+from os import getenv
+
+host_mingw_bits = getenv('COLINUX_HOST_MINGW_BITS', '32')
+mingw_entry_symbol = '_DriverEntry@8' if host_mingw_bits == '32' else 'DriverEntry'
+
 def optional_targets():
     import os
-    from os import getenv
     enable_fltk = getenv('COLINUX_ENABLE_FLTK')
     enable_wx = getenv('COLINUX_ENABLE_WX')
     out = []
@@ -176,11 +180,12 @@ def script_cmdline(scripter, tool_run_inf):
         "-Wl,--image-base,0x10000 "
         "-Wl,--file-alignment,0x1000 "
         "-Wl,--section-alignment,0x1000 "
-        "-Wl,--entry,_DriverEntry@8 "
+        "-Wl,--entry,%s "
         "-Wl,%s "
         "-mdll -nostartfiles -nostdlib "
         "-o %s %s -lndis -lntoskrnl -lhal -lgcc ") %
     (scripter.get_cross_build_tool('gcc', tool_run_inf),
+     mingw_entry_symbol,
      inputs[1].pathname,
      tool_run_inf.target.pathname,
      inputs[0].pathname))
@@ -228,11 +233,12 @@ def script_cmdline(scripter, tool_run_inf):
     command_line = ((
         "%s "
         "-Wl,--base-file,%s "
-        "-Wl,--entry,_DriverEntry@8 "
+        "-Wl,--entry,%s "
         "-nostartfiles -nostdlib "
         "-o junk.tmp %s -lndis -lntoskrnl -lhal -lgcc ; "
         "rm -f junk.tmp") %
     (scripter.get_cross_build_tool('gcc', tool_run_inf),
+     mingw_entry_symbol,
      tool_run_inf.target.pathname,
      inputs[0].pathname))
     return command_line
