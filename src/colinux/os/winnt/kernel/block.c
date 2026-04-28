@@ -10,7 +10,7 @@
 
 #include "ddk.h"
 
-#include <ddk/ntdddisk.h>
+#include <ntdddisk.h>
 
 #include <colinux/common/libc.h>
 #include <colinux/os/alloc.h>
@@ -110,7 +110,7 @@ co_rc_t co_os_file_block_read_write(co_monitor_t *monitor,
 	return rc;
 }
 
-static void CALLBACK transfer_file_block_callback(callback_context_t *context, PIO_STATUS_BLOCK IoStatusBlock, ULONG Reserved)
+static void transfer_file_block_callback(callback_context_t *context, PIO_STATUS_BLOCK IoStatusBlock, ULONG Reserved)
 {
 	co_debug_lvl(filesystem, 10, "cobd%d callback size=%ld info=%ld status=%X",
 			context->msg.linux_message.unit, context->size,

@@ -1,17 +1,21 @@
+from os import getenv
+
 def optional_targets():
     import os
-    from os import getenv
+    enable_fltk = getenv('COLINUX_ENABLE_FLTK')
     enable_wx = getenv('COLINUX_ENABLE_WX')
+    out = []
+    if enable_fltk != "no":
+        out.append(Input('colinux-console-fltk.exe'))
     if enable_wx:
         if enable_wx == "yes":
-            return [Input('colinux-console-wx.exe')]
-    return []
+            out.append(Input('colinux-console-wx.exe'))
+    return out
 
 targets['executables'] = Target(
     inputs=[
     Input('colinux-daemon.exe'),
     Input('colinux-net-daemon.exe'),
-    Input('colinux-console-fltk.exe'),
     Input('colinux-debug-daemon.exe'),
     Input('colinux-console-nt.exe'),
     Input('colinux-bridged-net-daemon.exe'),
@@ -28,13 +32,16 @@ def generate_options(compiler_def_type, libs=None, lflags=None):
         libs = []
     if not lflags:
         lflags = []
+    compile_flags = []
+    if getenv('COLINUX_ENABLE_MNO_CYGWIN') == "yes":
+        compile_flags.append('-mno-cygwin')
     return Options(
         overriders = dict(
             compiler_def_type = compiler_def_type,
             compiler_strip = True,
         ),
         appenders = dict(
-        compiler_flags = [ '-mno-cygwin' ],
+        compiler_flags = compile_flags,
         linker_flags = lflags,
         compiler_libs = libs + [
             'user32', 'gdi32', 'ws2_32', 'ntdll', 'kernel32', 'ole32', 'uuid', 'gdi32',
@@ -163,6 +170,8 @@ targets['driver.o'] = Target(
 
 def script_cmdline(scripter, tool_run_inf):
     inputs = tool_run_inf.target.get_actual_inputs()
+    host_mingw_bits = getenv('COLINUX_HOST_MINGW_BITS', '32')
+    mingw_entry_symbol = '_DriverEntry@8' if host_mingw_bits == '32' else 'DriverEntry'
     command_line = ((
         "%s "
         "-Wl,--strip-debug "
@@ -170,11 +179,12 @@ def script_cmdline(scripter, tool_run_inf):
         "-Wl,--image-base,0x10000 "
         "-Wl,--file-alignment,0x1000 "
         "-Wl,--section-alignment,0x1000 "
-        "-Wl,--entry,_DriverEntry@8 "
+        "-Wl,--entry,%s "
         "-Wl,%s "
         "-mdll -nostartfiles -nostdlib "
         "-o %s %s -lndis -lntoskrnl -lhal -lgcc ") %
     (scripter.get_cross_build_tool('gcc', tool_run_inf),
+     mingw_entry_symbol,
      inputs[1].pathname,
      tool_run_inf.target.pathname,
      inputs[0].pathname))
@@ -199,6 +209,8 @@ targets['linux.sys'] = Target(
 
 def script_cmdline(scripter, tool_run_inf):
     inputs = tool_run_inf.target.get_actual_inputs()
+    host_mingw_bits = getenv('COLINUX_HOST_MINGW_BITS', '32')
+    mingw_entry_symbol = '_DriverEntry@8' if host_mingw_bits == '32' else 'DriverEntry'
     command_line = ((
         "%s "
         "--dllname linux.sys "
@@ -219,15 +231,18 @@ targets['driver.base.exp'] = Target(
 
 def script_cmdline(scripter, tool_run_inf):
     inputs = tool_run_inf.target.get_actual_inputs()
+    host_mingw_bits = getenv('COLINUX_HOST_MINGW_BITS', '32')
+    mingw_entry_symbol = '_DriverEntry@8' if host_mingw_bits == '32' else 'DriverEntry'
     command_line = ((
         "%s "
         "-Wl,--base-file,%s "
-        "-Wl,--entry,_DriverEntry@8 "
+        "-Wl,--entry,%s "
         "-nostartfiles -nostdlib "
         "-o junk.tmp %s -lndis -lntoskrnl -lhal -lgcc ; "
         "rm -f junk.tmp") %
     (scripter.get_cross_build_tool('gcc', tool_run_inf),
      tool_run_inf.target.pathname,
+     mingw_entry_symbol,
      inputs[0].pathname))
     return command_line
 
